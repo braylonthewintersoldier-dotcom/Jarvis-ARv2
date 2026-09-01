@@ -20,7 +20,6 @@ const WORLD_HEIGHT = 4.5;
    ========================= */
 
 function initScene() {
-
     scene = new THREE.Scene();
 
     threeCamera = new THREE.PerspectiveCamera(
@@ -64,7 +63,9 @@ function initScene() {
         document.body.appendChild(renderer.domElement);
     }
 
-    /* LIGHTING */
+    /* =========================
+       LIGHTING
+       ========================= */
 
     const ambientLight = new THREE.AmbientLight(
         0xffffff,
@@ -102,7 +103,6 @@ function initScene() {
    ========================= */
 
 function hologramMaterial() {
-
     return new THREE.MeshStandardMaterial({
         color: 0x00ffff,
         emissive: 0x00ffff,
@@ -172,8 +172,6 @@ function addObject(type = "cube") {
         hologramMaterial()
     );
 
-    /* Put new objects near the center */
-
     mesh.position.set(
         0,
         0,
@@ -181,7 +179,9 @@ function addObject(type = "cube") {
     );
 
     mesh.userData.type = type;
-    mesh.userData.velocity = new THREE.Vector3();
+    mesh.userData.velocity =
+        new THREE.Vector3();
+
     mesh.userData.grabbed = false;
 
     scene.add(mesh);
@@ -199,17 +199,21 @@ function addObject(type = "cube") {
 }
 
 /* =========================
-   DELETE SELECTED
+   DELETE
    ========================= */
 
 function deleteSelected() {
 
     if (!selectedObject) {
-        console.log("JARVIS: Nothing selected");
+        console.log(
+            "JARVIS: Nothing selected"
+        );
         return;
     }
 
-    scene.remove(selectedObject);
+    scene.remove(
+        selectedObject
+    );
 
     if (selectedObject.geometry) {
         selectedObject.geometry.dispose();
@@ -220,14 +224,15 @@ function deleteSelected() {
     }
 
     objects = objects.filter(
-        obj => obj !== selectedObject
+        object => object !== selectedObject
     );
 
     selectedObject = null;
-
     grabbedObject = null;
 
-    console.log("JARVIS: Object deleted");
+    console.log(
+        "JARVIS: Object deleted"
+    );
 }
 
 /* =========================
@@ -237,18 +242,25 @@ function deleteSelected() {
 function duplicateSelected() {
 
     if (!selectedObject) {
-        console.log("JARVIS: Nothing selected");
+        console.log(
+            "JARVIS: Nothing selected"
+        );
         return;
     }
 
-    const clone = selectedObject.clone();
+    const clone =
+        selectedObject.clone();
 
     clone.position.x += 1;
     clone.position.y += 0.5;
 
     clone.userData = {
-        ...selectedObject.userData,
-        velocity: new THREE.Vector3(),
+        type:
+            selectedObject.userData.type,
+
+        velocity:
+            new THREE.Vector3(),
+
         grabbed: false
     };
 
@@ -258,7 +270,9 @@ function duplicateSelected() {
 
     selectedObject = clone;
 
-    console.log("JARVIS: Object duplicated");
+    console.log(
+        "JARVIS: Object duplicated"
+    );
 }
 
 /* =========================
@@ -285,16 +299,19 @@ function resetScene() {
     selectedObject = null;
     grabbedObject = null;
 
-    console.log("JARVIS: Scene reset");
+    console.log(
+        "JARVIS: Scene reset"
+    );
 }
 
 /* =========================
-   PHYSICS TOGGLE
+   PHYSICS
    ========================= */
 
 function togglePhysics() {
 
-    physicsEnabled = !physicsEnabled;
+    physicsEnabled =
+        !physicsEnabled;
 
     console.log(
         "JARVIS: Physics",
@@ -307,27 +324,35 @@ function togglePhysics() {
 }
 
 /* =========================
-   HAND POSITION
+   HAND → 3D WORLD
    ========================= */
 
 function handPositionToWorld(point) {
 
-    if (!point) return null;
+    if (!point) {
+        return null;
+    }
 
     /*
-       MediaPipe coordinates:
-       x = 0 → left
-       x = 1 → right
-       y = 0 → top
-       y = 1 → bottom
+       IMPORTANT
 
-       The camera and canvas are mirrored
-       together in CSS, so we keep the
-       tracking coordinates consistent.
+       The camera is mirrored with:
+
+       scaleX(-1)
+
+       Therefore we reverse MediaPipe's
+       X coordinate for the 3D world.
+
+       Physical hand moves RIGHT
+       → mirrored screen moves RIGHT
+       → 3D object moves RIGHT
     */
 
+    const mirroredX =
+        1 - point.x;
+
     const x =
-        (point.x - 0.5) *
+        (mirroredX - 0.5) *
         WORLD_WIDTH;
 
     const y =
@@ -345,17 +370,21 @@ function handPositionToWorld(point) {
 }
 
 /* =========================
-   FIND OBJECT NEAR HAND
+   FIND OBJECT
    ========================= */
 
-function findObjectNearHand(worldPosition) {
+function findObjectNearHand(
+    worldPosition
+) {
 
     if (!worldPosition) {
         return null;
     }
 
     let closest = null;
-    let closestDistance = Infinity;
+
+    let closestDistance =
+        Infinity;
 
     for (const object of objects) {
 
@@ -369,7 +398,8 @@ function findObjectNearHand(worldPosition) {
             distance < closestDistance
         ) {
             closest = object;
-            closestDistance = distance;
+            closestDistance =
+                distance;
         }
     }
 
@@ -380,14 +410,22 @@ function findObjectNearHand(worldPosition) {
    PINCH DETECTION
    ========================= */
 
-function isPinching(landmarks) {
+function isPinching(
+    landmarks
+) {
 
-    if (!landmarks || landmarks.length < 21) {
+    if (
+        !landmarks ||
+        landmarks.length < 21
+    ) {
         return false;
     }
 
-    const thumb = landmarks[4];
-    const index = landmarks[8];
+    const thumb =
+        landmarks[4];
+
+    const index =
+        landmarks[8];
 
     const dx =
         thumb.x - index.x;
@@ -398,23 +436,25 @@ function isPinching(landmarks) {
     const dz =
         thumb.z - index.z;
 
-    const distance = Math.sqrt(
-        dx * dx +
-        dy * dy +
-        dz * dz
-    );
+    const distance =
+        Math.sqrt(
+            dx * dx +
+            dy * dy +
+            dz * dz
+        );
 
     return distance < 0.055;
 }
 
 /* =========================
-   PROCESS HANDS
+   HAND INTERACTION
    ========================= */
 
 function updateHandInteraction() {
 
     if (
-        typeof getHandLandmarks !== "function"
+        typeof getHandLandmarks !==
+        "function"
     ) {
         return;
     }
@@ -434,12 +474,8 @@ function updateHandInteraction() {
         return;
     }
 
-    /*
-       Use the first detected hand
-       for grabbing.
-    */
-
-    const landmarks = hands[0];
+    const landmarks =
+        hands[0];
 
     const indexTip =
         landmarks[8];
@@ -455,7 +491,7 @@ function updateHandInteraction() {
         );
 
     /* =====================
-       START GRAB
+       GRAB
        ===================== */
 
     if (
@@ -470,11 +506,14 @@ function updateHandInteraction() {
 
         if (target) {
 
-            grabbedObject = target;
+            grabbedObject =
+                target;
 
-            selectedObject = target;
+            selectedObject =
+                target;
 
-            target.userData.grabbed = true;
+            target.userData.grabbed =
+                true;
 
             grabOffset
                 .copy(target.position)
@@ -487,7 +526,7 @@ function updateHandInteraction() {
     }
 
     /* =====================
-       MOVE GRABBED OBJECT
+       MOVE
        ===================== */
 
     if (
@@ -495,17 +534,13 @@ function updateHandInteraction() {
         grabbedObject
     ) {
 
-        grabbedObject.position.copy(
-            worldPosition
-        ).add(
-            grabOffset
-        );
+        grabbedObject.position
+            .copy(worldPosition)
+            .add(grabOffset);
 
-        grabbedObject.userData.velocity.set(
-            0,
-            0,
-            0
-        );
+        grabbedObject.userData
+            .velocity
+            .set(0, 0, 0);
     }
 
     /* =====================
@@ -522,7 +557,7 @@ function updateHandInteraction() {
 }
 
 /* =========================
-   RELEASE OBJECT
+   RELEASE
    ========================= */
 
 function releaseObject() {
@@ -531,7 +566,8 @@ function releaseObject() {
         return;
     }
 
-    grabbedObject.userData.grabbed = false;
+    grabbedObject.userData.grabbed =
+        false;
 
     console.log(
         "JARVIS: Object released"
@@ -541,10 +577,12 @@ function releaseObject() {
 }
 
 /* =========================
-   BASIC PHYSICS
+   PHYSICS UPDATE
    ========================= */
 
-function updatePhysics(deltaTime) {
+function updatePhysics(
+    deltaTime
+) {
 
     if (!physicsEnabled) {
         return;
@@ -552,7 +590,9 @@ function updatePhysics(deltaTime) {
 
     for (const object of objects) {
 
-        if (object.userData.grabbed) {
+        if (
+            object.userData.grabbed
+        ) {
             continue;
         }
 
@@ -563,17 +603,18 @@ function updatePhysics(deltaTime) {
             3.5 * deltaTime;
 
         object.position.x +=
-            velocity.x * deltaTime;
+            velocity.x *
+            deltaTime;
 
         object.position.y +=
-            velocity.y * deltaTime;
+            velocity.y *
+            deltaTime;
 
         object.position.z +=
-            velocity.z * deltaTime;
+            velocity.z *
+            deltaTime;
 
-        /*
-           Simple floor
-        */
+        /* Floor */
 
         if (
             object.position.y < -2
@@ -584,6 +625,7 @@ function updatePhysics(deltaTime) {
             velocity.y *= -0.55;
 
             velocity.x *= 0.92;
+
             velocity.z *= 0.92;
         }
     }
@@ -593,7 +635,8 @@ function updatePhysics(deltaTime) {
    ANIMATION
    ========================= */
 
-let lastTime = performance.now();
+let lastTime =
+    performance.now();
 
 function animate() {
 
@@ -606,11 +649,15 @@ function animate() {
 
     const deltaTime =
         Math.min(
-            (currentTime - lastTime) / 1000,
+            (
+                currentTime -
+                lastTime
+            ) / 1000,
             0.05
         );
 
-    lastTime = currentTime;
+    lastTime =
+        currentTime;
 
     updateHandInteraction();
 
@@ -618,12 +665,15 @@ function animate() {
         deltaTime
     );
 
-    /* Small hologram rotation */
+    /* Hologram movement */
 
-    for (const object of objects) {
+    for (
+        const object of objects
+    ) {
 
         if (
-            object !== grabbedObject
+            object !==
+            grabbedObject
         ) {
 
             object.rotation.y +=
@@ -666,32 +716,48 @@ function resizeScene() {
 }
 
 /* =========================
-   GET OBJECTS
+   GET SCENE OBJECTS
    ========================= */
 
 function getSceneObjects() {
 
     return objects.map(
         object => ({
+
             type:
                 object.userData.type,
 
             position: {
-                x: object.position.x,
-                y: object.position.y,
-                z: object.position.z
+                x:
+                    object.position.x,
+
+                y:
+                    object.position.y,
+
+                z:
+                    object.position.z
             },
 
             rotation: {
-                x: object.rotation.x,
-                y: object.rotation.y,
-                z: object.rotation.z
+                x:
+                    object.rotation.x,
+
+                y:
+                    object.rotation.y,
+
+                z:
+                    object.rotation.z
             },
 
             scale: {
-                x: object.scale.x,
-                y: object.scale.y,
-                z: object.scale.z
+                x:
+                    object.scale.x,
+
+                y:
+                    object.scale.y,
+
+                z:
+                    object.scale.z
             }
         })
     );
@@ -701,7 +767,8 @@ function getSceneObjects() {
    GLOBAL FUNCTIONS
    ========================= */
 
-window.addObject = addObject;
+window.addObject =
+    addObject;
 
 window.deleteSelected =
     deleteSelected;
@@ -722,15 +789,13 @@ window.getSelectedObject =
     () => selectedObject;
 
 /* =========================
-   START
+   START SCENE
    ========================= */
 
 window.addEventListener(
     "load",
     () => {
-
         initScene();
-
     }
 );
 
