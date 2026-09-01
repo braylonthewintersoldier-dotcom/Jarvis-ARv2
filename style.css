@@ -1,34 +1,22 @@
 * {
     box-sizing: border-box;
+    margin: 0;
+    padding: 0;
 }
 
 html,
 body {
-    margin: 0;
     width: 100%;
     height: 100%;
     overflow: hidden;
-    background: black;
-    font-family: Arial, Helvetica, sans-serif;
-    color: #00eaff;
+    background: #000;
+    font-family: Arial, sans-serif;
+    color: #00ffff;
 }
 
-
-/* =================================
-   MAIN
-================================= */
-
-#app {
-    position: relative;
-    width: 100vw;
-    height: 100vh;
-    overflow: hidden;
-}
-
-
-/* =================================
-   CAMERA
-================================= */
+/* =========================
+   MAIN CAMERA
+   ========================= */
 
 #camera {
     position: absolute;
@@ -36,45 +24,42 @@ body {
     width: 100%;
     height: 100%;
     object-fit: cover;
-
-    /* FIXED: camera is no longer mirrored */
-    transform: none;
-
+    transform: scaleX(-1);
     z-index: 0;
+    background: #000;
 }
 
-
-/* =================================
+/* =========================
    HAND TRACKING
-================================= */
+   ========================= */
 
 #handCanvas {
     position: absolute;
     inset: 0;
     width: 100%;
     height: 100%;
+    object-fit: cover;
+    transform: scaleX(-1);
     z-index: 2;
     pointer-events: none;
 }
 
+/* =========================
+   THREE.JS HOLOGRAM
+   ========================= */
 
-/* =================================
-   THREE JS
-================================= */
-
-#scene {
+#threeCanvas {
     position: absolute;
     inset: 0;
     width: 100%;
     height: 100%;
-    z-index: 3;
+    z-index: 1;
     pointer-events: none;
 }
 
-
-/* =================================
+/* =========================
    HUD
-================================= */
+   ========================= */
 
 #hud {
     position: absolute;
@@ -83,407 +68,432 @@ body {
     pointer-events: none;
 }
 
+/* =========================
+   TOP BAR
+   ========================= */
 
-/* =================================
-   TOP
-================================= */
-
-.topbar {
+#topBar {
     position: absolute;
     top: 15px;
-    left: 18px;
-    right: 18px;
+    left: 50%;
+    transform: translateX(-50%);
 
     display: flex;
-    justify-content: space-between;
     align-items: center;
-}
+    gap: 10px;
 
+    padding: 8px 14px;
 
-.logo {
-    font-size: 18px;
-    font-weight: bold;
-    letter-spacing: 4px;
-    opacity: 0.85;
+    background: rgba(0, 10, 15, 0.65);
+    border: 1px solid rgba(0, 255, 255, 0.35);
+    border-radius: 12px;
 
-    text-shadow:
-        0 0 8px #00eaff;
-}
-
-
-#systemStatus {
-    font-size: 9px;
-    letter-spacing: 1px;
-    opacity: 0.75;
-}
-
-
-/* =================================
-   SMALL TOOLBARS
-================================= */
-
-.toolbar {
-    position: absolute;
-    top: 60px;
-
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
 
     pointer-events: auto;
 }
 
+/* =========================
+   JARVIS TITLE
+   ========================= */
 
-.toolbar.left {
-    left: 12px;
-}
-
-
-.toolbar.right {
-    right: 12px;
-}
-
-
-/* =================================
-   BUTTONS
-================================= */
-
-button {
-    width: 42px;
-    height: 32px;
-    padding: 0;
-
-    border: 1px solid rgba(
-        0,
-        234,
-        255,
-        0.65
-    );
-
-    background: rgba(
-        0,
-        5,
-        10,
-        0.42
-    );
-
-    color: #00eaff;
-
-    font-size: 8px;
+#jarvisTitle {
+    font-size: 14px;
     font-weight: bold;
+    letter-spacing: 2px;
+    white-space: nowrap;
+}
+
+/* =========================
+   STATUS
+   ========================= */
+
+#status {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+
+    padding: 7px 11px;
+
+    background: rgba(0, 10, 15, 0.65);
+    border: 1px solid rgba(0, 255, 255, 0.3);
+    border-radius: 8px;
+
+    font-size: 11px;
     letter-spacing: 1px;
+
+    backdrop-filter: blur(8px);
+}
+
+/* =========================
+   CAMERA BUTTON
+   ========================= */
+
+#cameraBtn {
+    padding: 7px 12px;
+
+    background: rgba(0, 255, 255, 0.08);
+    color: #00ffff;
+
+    border: 1px solid rgba(0, 255, 255, 0.45);
+    border-radius: 8px;
 
     cursor: pointer;
 
-    backdrop-filter: blur(5px);
-
-    transition:
-        background 0.15s,
-        box-shadow 0.15s;
+    font-size: 11px;
+    font-weight: bold;
 }
 
-
-button:hover {
-    background: rgba(
-        0,
-        234,
-        255,
-        0.15
-    );
-
-    box-shadow:
-        0 0 8px
-        rgba(
-            0,
-            234,
-            255,
-            0.5
-        );
+#cameraBtn:hover {
+    background: rgba(0, 255, 255, 0.18);
 }
 
+/* =========================
+   CROSSHAIR
+   ========================= */
 
-/* =================================
-   OBJECT MENU
-================================= */
+#crosshair {
+    position: absolute;
+    top: 50%;
+    left: 50%;
 
-#objectMenu {
+    width: 24px;
+    height: 24px;
+
+    transform: translate(-50%, -50%);
+
+    border: 1px solid rgba(0, 255, 255, 0.45);
+    border-radius: 50%;
+
+    pointer-events: none;
+}
+
+#crosshair::before,
+#crosshair::after {
+    content: "";
+
     position: absolute;
 
-    top: 60px;
-    left: 65px;
-
-    display: flex;
-    gap: 4px;
-
-    pointer-events: auto;
-    opacity: 0.75;
+    background: rgba(0, 255, 255, 0.6);
 }
 
+#crosshair::before {
+    width: 1px;
+    height: 34px;
 
-#objectMenu button {
-    width: 35px;
-    height: 25px;
-    font-size: 7px;
+    top: -6px;
+    left: 11px;
 }
 
+#crosshair::after {
+    width: 34px;
+    height: 1px;
 
-/* =================================
+    left: -6px;
+    top: 11px;
+}
+
+/* =========================
    RETICLE
-================================= */
+   ========================= */
 
 #reticle {
     position: absolute;
 
-    width: 15px;
-    height: 15px;
+    width: 35px;
+    height: 35px;
 
-    border: 1px solid #00eaff;
+    border: 2px solid #00ffff;
     border-radius: 50%;
 
-    transform:
-        translate(-50%, -50%);
+    transform: translate(-50%, -50%);
 
     display: none;
 
-    box-shadow:
-        0 0 8px #00eaff;
+    pointer-events: none;
 }
 
+/* =========================
+   RIGHT CONTROL PANEL
+   ========================= */
 
-/* =================================
-   JARVIS
-================================= */
+#controls {
+    position: absolute;
+
+    right: 15px;
+    top: 50%;
+
+    transform: translateY(-50%);
+
+    width: 145px;
+
+    padding: 10px;
+
+    background: rgba(0, 10, 15, 0.68);
+
+    border: 1px solid rgba(0, 255, 255, 0.3);
+    border-radius: 12px;
+
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+
+    pointer-events: auto;
+}
+
+/* =========================
+   CONTROL BUTTONS
+   ========================= */
+
+#controls button,
+.controlButton {
+    width: 100%;
+
+    margin-bottom: 6px;
+
+    padding: 7px 6px;
+
+    background: rgba(0, 255, 255, 0.06);
+    color: #00ffff;
+
+    border: 1px solid rgba(0, 255, 255, 0.28);
+    border-radius: 7px;
+
+    font-size: 10px;
+    font-weight: bold;
+
+    cursor: pointer;
+}
+
+#controls button:last-child {
+    margin-bottom: 0;
+}
+
+#controls button:hover,
+.controlButton:hover {
+    background: rgba(0, 255, 255, 0.16);
+    border-color: rgba(0, 255, 255, 0.6);
+}
+
+#controls button:active,
+.controlButton:active {
+    transform: scale(0.97);
+}
+
+/* =========================
+   OBJECT BUTTONS
+   ========================= */
+
+#objectButtons {
+    display: grid;
+
+    grid-template-columns: 1fr 1fr;
+
+    gap: 5px;
+
+    margin-bottom: 7px;
+}
+
+#objectButtons button {
+    margin-bottom: 0;
+}
+
+/* =========================
+   JARVIS CHAT
+   ========================= */
 
 #jarvisPanel {
     position: absolute;
 
-    left: 50%;
-    bottom: 48px;
+    left: 15px;
+    bottom: 60px;
 
-    transform:
-        translateX(-50%);
-
-    width: min(
-        380px,
-        55vw
-    );
-
-    background: rgba(
-        0,
-        5,
-        10,
-        0.58
-    );
-
-    border:
-        1px solid
-        rgba(
-            0,
-            234,
-            255,
-            0.45
-        );
-
-    backdrop-filter:
-        blur(7px);
-
-    pointer-events: auto;
-
-    opacity: 0.82;
-}
-
-
-/* =================================
-   JARVIS HEADER
-================================= */
-
-#jarvisHeader {
-    height: 25px;
+    width: 250px;
+    max-height: 250px;
 
     display: flex;
+    flex-direction: column;
 
-    justify-content: space-between;
-    align-items: center;
+    background: rgba(0, 10, 15, 0.72);
 
-    padding: 0 9px;
+    border: 1px solid rgba(0, 255, 255, 0.32);
+    border-radius: 12px;
 
-    border-bottom:
-        1px solid
-        rgba(
-            0,
-            234,
-            255,
-            0.2
-        );
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
 
-    font-size: 9px;
-    letter-spacing: 2px;
+    pointer-events: auto;
 }
 
+/* =========================
+   CHAT HEADER
+   ========================= */
 
-/* =================================
-   CHAT
-================================= */
+#jarvisHeader {
+    padding: 8px 10px;
 
-#chatOutput {
-    height: 55px;
+    border-bottom: 1px solid rgba(0, 255, 255, 0.2);
+
+    font-size: 11px;
+    font-weight: bold;
+    letter-spacing: 1px;
+}
+
+/* =========================
+   CHAT MESSAGES
+   ========================= */
+
+#chatMessages {
+    flex: 1;
 
     overflow-y: auto;
 
-    padding: 7px;
+    padding: 8px;
 
-    font-size: 9px;
+    font-size: 10px;
     line-height: 1.4;
 }
 
-
-.jarvisLine {
-    margin-bottom: 4px;
+#chatMessages::-webkit-scrollbar {
+    width: 3px;
 }
 
-
-.userLine {
-    color: white;
+#chatMessages::-webkit-scrollbar-thumb {
+    background: rgba(0, 255, 255, 0.4);
 }
 
+/* =========================
+   CHAT INPUT
+   ========================= */
 
-/* =================================
-   INPUT
-================================= */
-
-#chatControls {
+#chatInputArea {
     display: flex;
-
-    height: 30px;
-
-    border-top:
-        1px solid
-        rgba(
-            0,
-            234,
-            255,
-            0.2
-        );
-}
-
-
-#chatInput {
-    flex: 1;
-    min-width: 0;
-
-    border: 0;
-    outline: 0;
-
-    background: transparent;
-
-    color: white;
+    gap: 5px;
 
     padding: 7px;
 
-    font-size: 9px;
+    border-top: 1px solid rgba(0, 255, 255, 0.2);
 }
 
+#chatInput {
+    flex: 1;
 
-#micBtn,
-#sendBtn {
-    width: 35px;
+    min-width: 0;
+
+    padding: 7px;
+
+    background: rgba(0, 0, 0, 0.45);
+
+    color: #00ffff;
+
+    border: 1px solid rgba(0, 255, 255, 0.3);
+    border-radius: 6px;
+
+    outline: none;
+
+    font-size: 10px;
+}
+
+#chatInput:focus {
+    border-color: rgba(0, 255, 255, 0.7);
+}
+
+#sendBtn,
+#micBtn {
+    width: 30px;
     height: 30px;
 
-    border: 0;
+    background: rgba(0, 255, 255, 0.08);
 
-    border-left:
-        1px solid
-        rgba(
-            0,
-            234,
-            255,
-            0.3
-        );
+    color: #00ffff;
+
+    border: 1px solid rgba(0, 255, 255, 0.35);
+    border-radius: 6px;
+
+    cursor: pointer;
 }
 
+/* =========================
+   BOTTOM STATUS BAR
+   ========================= */
 
-/* =================================
-   STATUS
-================================= */
-
-#status {
+#bottomBar {
     position: absolute;
 
-    bottom: 12px;
     left: 50%;
+    bottom: 12px;
 
-    transform:
-        translateX(-50%);
+    transform: translateX(-50%);
 
     display: flex;
-
+    align-items: center;
     gap: 15px;
 
-    padding: 5px 10px;
+    padding: 7px 12px;
 
-    background: rgba(
-        0,
-        5,
-        10,
-        0.35
-    );
+    background: rgba(0, 10, 15, 0.65);
 
-    border:
-        1px solid
-        rgba(
-            0,
-            234,
-            255,
-            0.25
-        );
+    border: 1px solid rgba(0, 255, 255, 0.28);
+    border-radius: 10px;
 
-    font-size: 7px;
-    letter-spacing: 1px;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
 
-    opacity: 0.7;
+    font-size: 9px;
+    letter-spacing: 0.5px;
+
+    pointer-events: none;
 }
 
+/* =========================
+   STATUS ITEMS
+   ========================= */
 
-#status b {
-    color: white;
+.statusItem {
+    white-space: nowrap;
 }
 
+.statusValue {
+    font-weight: bold;
+}
 
-/* =================================
+/* =========================
+   HIDDEN
+   ========================= */
+
+.hidden {
+    display: none !important;
+}
+
+/* =========================
    MOBILE
-================================= */
+   ========================= */
 
-@media(max-width: 700px) {
+@media (max-width: 700px) {
 
-    .toolbar {
-        transform:
-            scale(0.85);
-
-        transform-origin:
-            top;
+    #controls {
+        right: 8px;
+        width: 115px;
     }
-
-
-    #objectMenu {
-        left: 52px;
-
-        transform:
-            scale(0.8);
-
-        transform-origin:
-            top left;
-    }
-
 
     #jarvisPanel {
-        width: 58vw;
-        bottom: 45px;
+        left: 8px;
+        bottom: 50px;
+        width: 210px;
     }
 
+    #topBar {
+        top: 8px;
+    }
 
     #status {
-        gap: 8px;
-        font-size: 6px;
+        top: 8px;
+        left: 8px;
     }
 
+    #bottomBar {
+        bottom: 7px;
+        gap: 8px;
+        padding: 5px 8px;
+    }
 }
