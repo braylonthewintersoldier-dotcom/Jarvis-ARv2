@@ -4,8 +4,6 @@ const JARVIS_HANDS = {
 
     camera: null,
 
-    front: true,
-
     detected: 0,
 
     grabbing: false,
@@ -23,7 +21,265 @@ const JARVIS_HANDS = {
 };
 
 
-function distance3D(a, b) {
+/* =================================
+   HAND CANVAS
+================================= */
+
+const handCanvas =
+    document.getElementById(
+        "handCanvas"
+    );
+
+
+const handCtx =
+    handCanvas.getContext(
+        "2d"
+    );
+
+
+function resizeHandCanvas() {
+
+    handCanvas.width =
+        window.innerWidth *
+        window.devicePixelRatio;
+
+    handCanvas.height =
+        window.innerHeight *
+        window.devicePixelRatio;
+
+
+    handCanvas.style.width =
+        window.innerWidth + "px";
+
+
+    handCanvas.style.height =
+        window.innerHeight + "px";
+
+
+    handCtx.setTransform(
+        window.devicePixelRatio,
+        0,
+        0,
+        window.devicePixelRatio,
+        0,
+        0
+    );
+
+}
+
+
+resizeHandCanvas();
+
+
+window.addEventListener(
+    "resize",
+    resizeHandCanvas
+);
+
+
+/* =================================
+   HAND DRAWING
+================================= */
+
+const HAND_CONNECTIONS = [
+
+    [0,1],
+    [1,2],
+    [2,3],
+    [3,4],
+
+    [0,5],
+    [5,6],
+    [6,7],
+    [7,8],
+
+    [5,9],
+    [9,10],
+    [10,11],
+    [11,12],
+
+    [9,13],
+    [13,14],
+    [14,15],
+    [15,16],
+
+    [13,17],
+    [17,18],
+    [18,19],
+    [19,20],
+
+    [0,17]
+
+];
+
+
+function drawHand(
+    landmarks
+) {
+
+    const width =
+        window.innerWidth;
+
+
+    const height =
+        window.innerHeight;
+
+
+    handCtx.lineWidth =
+        1.5;
+
+
+    handCtx.lineCap =
+        "round";
+
+
+    /*
+       Draw skeleton
+    */
+
+    for(
+        const connection
+        of HAND_CONNECTIONS
+    ) {
+
+        const a =
+            landmarks[
+                connection[0]
+            ];
+
+
+        const b =
+            landmarks[
+                connection[1]
+            ];
+
+
+        const ax =
+            (1 - a.x) *
+            width;
+
+
+        const ay =
+            a.y *
+            height;
+
+
+        const bx =
+            (1 - b.x) *
+            width;
+
+
+        const by =
+            b.y *
+            height;
+
+
+        handCtx.beginPath();
+
+        handCtx.moveTo(
+            ax,
+            ay
+        );
+
+        handCtx.lineTo(
+            bx,
+            by
+        );
+
+        handCtx.stroke();
+
+    }
+
+
+    /*
+       Draw landmarks
+    */
+
+    for(
+        let i = 0;
+        i < landmarks.length;
+        i++
+    ) {
+
+        const point =
+            landmarks[i];
+
+
+        const x =
+            (1 - point.x) *
+            width;
+
+
+        const y =
+            point.y *
+            height;
+
+
+        handCtx.beginPath();
+
+
+        const radius =
+            i === 8 ||
+            i === 4
+                ? 5
+                : 2.5;
+
+
+        handCtx.arc(
+            x,
+            y,
+            radius,
+            0,
+            Math.PI * 2
+        );
+
+
+        handCtx.fill();
+
+    }
+
+
+    /*
+       Index finger targeting ring
+    */
+
+    const index =
+        landmarks[8];
+
+
+    const ix =
+        (1 - index.x) *
+        width;
+
+
+    const iy =
+        index.y *
+        height;
+
+
+    handCtx.beginPath();
+
+    handCtx.arc(
+        ix,
+        iy,
+        10,
+        0,
+        Math.PI * 2
+    );
+
+    handCtx.stroke();
+
+}
+
+
+/* =================================
+   DISTANCE
+================================= */
+
+function distance3D(
+    a,
+    b
+) {
 
     const dx =
         a.x - b.x;
@@ -45,21 +301,35 @@ function distance3D(a, b) {
 }
 
 
-function pinching(hand) {
+/* =================================
+   PINCH
+================================= */
+
+function pinching(
+    hand
+) {
 
     if(!hand)
         return false;
 
 
-    return distance3D(
-        hand[4],
-        hand[8]
-    ) < 0.055;
+    return (
+        distance3D(
+            hand[4],
+            hand[8]
+        ) < 0.055
+    );
 
 }
 
 
-function handToWorld(point) {
+/* =================================
+   WORLD POSITION
+================================= */
+
+function handToWorld(
+    point
+) {
 
     return new THREE.Vector3(
 
@@ -74,17 +344,25 @@ function handToWorld(point) {
 }
 
 
-function closestObject(position) {
+/* =================================
+   FIND OBJECT
+================================= */
 
-    let result = null;
+function closestObject(
+    position
+) {
+
+    let result =
+        null;
+
 
     let smallest =
         Infinity;
 
 
     for(
-        const object of
-        JARVIS_SCENE.objects
+        const object
+        of JARVIS_SCENE.objects
     ) {
 
         const d =
@@ -97,9 +375,12 @@ function closestObject(position) {
             d < smallest
         ) {
 
-            smallest = d;
+            smallest =
+                d;
 
-            result = object;
+
+            result =
+                object;
 
         }
 
@@ -112,6 +393,10 @@ function closestObject(position) {
 
 }
 
+
+/* =================================
+   START TRACKING
+================================= */
 
 async function startHandTracking() {
 
@@ -161,15 +446,11 @@ async function startHandTracking() {
                 onFrame:
                     async () => {
 
-                        if(
-                            JARVIS_HANDS.hands
-                        ) {
-
-                            await JARVIS_HANDS.hands.send({
+                        await
+                        JARVIS_HANDS.hands
+                            .send({
                                 image: video
                             });
-
-                        }
 
                     }
 
@@ -182,7 +463,25 @@ async function startHandTracking() {
 }
 
 
-function processHands(results) {
+/* =================================
+   PROCESS
+================================= */
+
+function processHands(
+    results
+) {
+
+    /*
+       Clear previous hand drawings
+    */
+
+    handCtx.clearRect(
+        0,
+        0,
+        window.innerWidth,
+        window.innerHeight
+    );
+
 
     const all =
         results.multiHandLandmarks || [];
@@ -198,7 +497,29 @@ function processHands(results) {
         all.length;
 
 
-    if(all.length === 0) {
+    /*
+       DRAW HANDS
+    */
+
+    for(
+        const hand
+        of all
+    ) {
+
+        drawHand(
+            hand
+        );
+
+    }
+
+
+    /*
+       No hands
+    */
+
+    if(
+        all.length === 0
+    ) {
 
         if(
             JARVIS_HANDS.grabbing
@@ -208,10 +529,21 @@ function processHands(results) {
 
         }
 
+
+        document.getElementById(
+            "reticle"
+        ).style.display =
+            "none";
+
+
         return;
 
     }
 
+
+    /*
+       First hand
+    */
 
     const hand =
         all[0];
@@ -222,14 +554,14 @@ function processHands(results) {
 
 
     const world =
-        handToWorld(index);
+        handToWorld(
+            index
+        );
 
 
-    const pinch =
-        pinching(hand);
-
-
-    // RETICLE
+    /*
+       Reticle
+    */
 
     const reticle =
         document.getElementById(
@@ -242,14 +574,24 @@ function processHands(results) {
 
 
     reticle.style.left =
-        `${index.x * 100}%`;
+        `${(1 - index.x) * 100}%`;
 
 
     reticle.style.top =
         `${index.y * 100}%`;
 
 
-    // START GRAB
+    /*
+       Pinch
+    */
+
+    const pinch =
+        pinching(hand);
+
+
+    /*
+       Start grabbing
+    */
 
     if(
         pinch &&
@@ -276,7 +618,9 @@ function processHands(results) {
                 object;
 
 
-            selectObject(object);
+            selectObject(
+                object
+            );
 
 
             JARVIS_HANDS.lastPosition =
@@ -286,14 +630,16 @@ function processHands(results) {
             document.getElementById(
                 "modeText"
             ).textContent =
-                "GRABBING";
+                "GRAB";
 
         }
 
     }
 
 
-    // MOVE
+    /*
+       Move grabbed object
+    */
 
     if(
         pinch &&
@@ -331,7 +677,9 @@ function processHands(results) {
     }
 
 
-    // RELEASE
+    /*
+       Release
+    */
 
     if(
         !pinch &&
@@ -343,7 +691,9 @@ function processHands(results) {
     }
 
 
-    // TWO HANDS
+    /*
+       Two hands
+    */
 
     if(
         all.length === 2
@@ -357,13 +707,18 @@ function processHands(results) {
     }
     else {
 
-        JARVIS_HANDS.twoHandStartDistance =
+        JARVIS_HANDS
+            .twoHandStartDistance =
             null;
 
     }
 
 }
 
+
+/* =================================
+   RELEASE
+================================= */
 
 function releaseGrab() {
 
@@ -391,6 +746,10 @@ function releaseGrab() {
 }
 
 
+/* =================================
+   TWO HANDS
+================================= */
+
 function processTwoHands(
     hand1,
     hand2
@@ -406,6 +765,7 @@ function processTwoHands(
 
     const p1 =
         hand1[8];
+
 
     const p2 =
         hand2[8];
@@ -426,18 +786,22 @@ function processTwoHands(
 
 
     if(
-        JARVIS_HANDS.twoHandStartDistance === null
+        JARVIS_HANDS
+            .twoHandStartDistance === null
     ) {
 
-        JARVIS_HANDS.twoHandStartDistance =
+        JARVIS_HANDS
+            .twoHandStartDistance =
             d;
 
 
-        JARVIS_HANDS.twoHandStartScale =
+        JARVIS_HANDS
+            .twoHandStartScale =
             object.scale.x;
 
 
-        JARVIS_HANDS.twoHandStartAngle =
+        JARVIS_HANDS
+            .twoHandStartAngle =
             angle;
 
 
@@ -446,30 +810,41 @@ function processTwoHands(
     }
 
 
-    const scaleRatio =
+    /*
+       SCALE
+    */
+
+    const ratio =
         d /
-        JARVIS_HANDS.twoHandStartDistance;
+        JARVIS_HANDS
+            .twoHandStartDistance;
 
 
-    const newScale =
+    const scale =
         Math.max(
             0.15,
             Math.min(
                 5,
-                JARVIS_HANDS.twoHandStartScale *
-                scaleRatio
+                JARVIS_HANDS
+                    .twoHandStartScale *
+                ratio
             )
         );
 
 
     object.scale.setScalar(
-        newScale
+        scale
     );
 
 
+    /*
+       ROTATE
+    */
+
     const rotation =
         angle -
-        JARVIS_HANDS.twoHandStartAngle;
+        JARVIS_HANDS
+            .twoHandStartAngle;
 
 
     object.rotation.z =
@@ -479,6 +854,6 @@ function processTwoHands(
     document.getElementById(
         "modeText"
     ).textContent =
-        "TWO-HAND";
+        "TWO HAND";
 
 }
