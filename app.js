@@ -3,10 +3,6 @@
 // JARVIS CONFIG
 // ======================================
 
-// Put your Render backend URL here later.
-// Example:
-// https://your-backend.onrender.com
-
 const API_BASE =
     "PASTE_YOUR_RENDER_BACKEND_URL_HERE";
 
@@ -17,9 +13,9 @@ const API_BASE =
 
 document.addEventListener(
     "DOMContentLoaded",
-    async () => {
+    async function () {
 
-        console.log("JARVIS: App starting...");
+        console.log("JARVIS: App starting");
 
         try {
 
@@ -35,13 +31,9 @@ document.addEventListener(
 
             await startCamera();
 
-            // handTracking.js also starts itself,
-            // so don't start it twice here.
+            console.log("JARVIS: App ready");
 
-            console.log("JARVIS: App started.");
-
-        }
-        catch (error) {
+        } catch (error) {
 
             console.error(
                 "JARVIS startup error:",
@@ -70,7 +62,7 @@ async function startCamera() {
     if (!video) {
 
         console.error(
-            "JARVIS: Camera element not found."
+            "JARVIS: camera element not found"
         );
 
         return;
@@ -84,7 +76,7 @@ async function startCamera() {
     ) {
 
         console.error(
-            "JARVIS: Camera API not available."
+            "JARVIS: camera API unavailable"
         );
 
         return;
@@ -92,22 +84,24 @@ async function startCamera() {
     }
 
 
-    const oldStream =
-        video.srcObject;
-
-
-    if (oldStream) {
-
-        oldStream
-            .getTracks()
-            .forEach(
-                track => track.stop()
-            );
-
-    }
-
-
     try {
+
+        const oldStream =
+            video.srcObject;
+
+
+        if (oldStream) {
+
+            oldStream
+                .getTracks()
+                .forEach(
+                    function (track) {
+                        track.stop();
+                    }
+                );
+
+        }
+
 
         const stream =
             await navigator.mediaDevices.getUserMedia({
@@ -134,6 +128,16 @@ async function startCamera() {
 
         video.srcObject =
             stream;
+
+
+        video.setAttribute(
+            "playsinline",
+            ""
+        );
+
+
+        video.muted =
+            true;
 
 
         await video.play();
@@ -170,11 +174,10 @@ async function startCamera() {
 
 
         console.log(
-            "JARVIS: Camera started."
+            "JARVIS: Camera started"
         );
 
-    }
-    catch (error) {
+    } catch (error) {
 
         console.error(
             "JARVIS camera error:",
@@ -205,6 +208,10 @@ async function startCamera() {
 }
 
 
+// ======================================
+// SWITCH CAMERA
+// ======================================
+
 async function switchCamera() {
 
     currentFacing =
@@ -219,17 +226,20 @@ async function switchCamera() {
 
 
 // ======================================
-// SAFE BUTTON SETUP
+// BUTTON SETUP
 // ======================================
 
 function setupButtons() {
 
     console.log(
-        "JARVIS: Setting up buttons..."
+        "JARVIS: Setting up buttons"
     );
 
 
-    function button(id, action) {
+    function connectButton(
+        id,
+        action
+    ) {
 
         const element =
             document.getElementById(id);
@@ -238,7 +248,7 @@ function setupButtons() {
         if (!element) {
 
             console.warn(
-                "JARVIS: Button not found:",
+                "JARVIS: Missing element:",
                 id
             );
 
@@ -253,23 +263,19 @@ function setupButtons() {
     }
 
 
-    // ==================================
     // CAMERA
-    // ==================================
 
-    button(
+    connectButton(
         "cameraBtn",
         switchCamera
     );
 
 
-    // ==================================
-    // CREATE OBJECTS
-    // ==================================
+    // CUBE
 
-    button(
+    connectButton(
         "cubeBtn",
-        () => {
+        function () {
 
             if (
                 typeof addObject ===
@@ -293,9 +299,11 @@ function setupButtons() {
     );
 
 
-    button(
+    // SPHERE
+
+    connectButton(
         "sphereBtn",
-        () => {
+        function () {
 
             if (
                 typeof addObject ===
@@ -319,9 +327,11 @@ function setupButtons() {
     );
 
 
-    button(
+    // CYLINDER
+
+    connectButton(
         "cylinderBtn",
-        () => {
+        function () {
 
             if (
                 typeof addObject ===
@@ -345,9 +355,11 @@ function setupButtons() {
     );
 
 
-    button(
+    // PYRAMID
+
+    connectButton(
         "pyramidBtn",
-        () => {
+        function () {
 
             if (
                 typeof addObject ===
@@ -371,9 +383,11 @@ function setupButtons() {
     );
 
 
-    button(
+    // TORUS
+
+    connectButton(
         "torusBtn",
-        () => {
+        function () {
 
             if (
                 typeof addObject ===
@@ -397,13 +411,11 @@ function setupButtons() {
     );
 
 
-    // ==================================
     // DELETE
-    // ==================================
 
-    button(
+    connectButton(
         "deleteBtn",
-        () => {
+        function () {
 
             if (
                 typeof removeObject !==
@@ -430,13 +442,11 @@ function setupButtons() {
     );
 
 
-    // ==================================
     // DUPLICATE
-    // ==================================
 
-    button(
+    connectButton(
         "duplicateBtn",
-        () => {
+        function () {
 
             if (
                 typeof duplicateObject ===
@@ -451,13 +461,11 @@ function setupButtons() {
     );
 
 
-    // ==================================
     // PHYSICS
-    // ==================================
 
-    button(
+    connectButton(
         "physicsBtn",
-        () => {
+        function () {
 
             if (
                 !window.JARVIS_SCENE
@@ -487,23 +495,15 @@ function setupButtons() {
 
             }
 
-
-            console.log(
-                "JARVIS physics:",
-                JARVIS_SCENE.physics
-            );
-
         }
     );
 
 
-    // ==================================
     // RESET
-    // ==================================
 
-    button(
+    connectButton(
         "resetBtn",
-        () => {
+        function () {
 
             if (
                 typeof clearScene ===
@@ -518,13 +518,11 @@ function setupButtons() {
     );
 
 
-    // ==================================
     // SAVE
-    // ==================================
 
-    button(
+    connectButton(
         "saveBtn",
-        () => {
+        function () {
 
             if (
                 typeof saveProject ===
@@ -539,13 +537,11 @@ function setupButtons() {
     );
 
 
-    // ==================================
     // LOAD
-    // ==================================
 
-    button(
+    connectButton(
         "loadBtn",
-        () => {
+        function () {
 
             if (
                 typeof loadProject ===
@@ -560,13 +556,11 @@ function setupButtons() {
     );
 
 
-    // ==================================
     // EXPORT
-    // ==================================
 
-    button(
+    connectButton(
         "exportBtn",
-        () => {
+        function () {
 
             if (
                 typeof exportProject ===
@@ -581,13 +575,11 @@ function setupButtons() {
     );
 
 
-    // ==================================
     // MICROPHONE
-    // ==================================
 
-    button(
+    connectButton(
         "micBtn",
-        () => {
+        function () {
 
             if (
                 typeof startVoice ===
@@ -602,19 +594,15 @@ function setupButtons() {
     );
 
 
-    // ==================================
-    // SEND CHAT
-    // ==================================
+    // SEND
 
-    button(
+    connectButton(
         "sendBtn",
         sendJarvisMessage
     );
 
 
-    // ==================================
     // CHAT INPUT
-    // ==================================
 
     const chatInput =
         document.getElementById(
@@ -626,7 +614,7 @@ function setupButtons() {
 
         chatInput.addEventListener(
             "keydown",
-            event => {
+            function (event) {
 
                 if (
                     event.key ===
@@ -643,22 +631,13 @@ function setupButtons() {
         );
 
     }
-    else {
-
-        console.warn(
-            "JARVIS: chatInput not found."
-        );
-
-    }
 
 
-    // ==================================
-    // BUILD MODE
-    // ==================================
+    // BUILD
 
-    button(
+    connectButton(
         "buildBtn",
-        () => {
+        function () {
 
             addJarvisLine(
                 "JARVIS: Build mode active. Tell me what you want to create."
@@ -669,14 +648,14 @@ function setupButtons() {
 
 
     console.log(
-        "JARVIS: Button setup complete."
+        "JARVIS: Buttons ready"
     );
 
 }
 
 
 // ======================================
-// JARVIS CHAT
+// JARVIS CHAT OUTPUT
 // ======================================
 
 function addJarvisLine(text) {
@@ -690,7 +669,7 @@ function addJarvisLine(text) {
     if (!output) {
 
         console.warn(
-            "JARVIS: chatOutput not found."
+            "JARVIS: chatOutput not found"
         );
 
         return;
@@ -722,6 +701,10 @@ function addJarvisLine(text) {
 
 }
 
+
+// ======================================
+// USER CHAT OUTPUT
+// ======================================
 
 function addUserLine(text) {
 
@@ -777,10 +760,6 @@ async function sendJarvisMessage() {
 
     if (!input) {
 
-        console.warn(
-            "JARVIS: chatInput not found."
-        );
-
         return;
 
     }
@@ -806,15 +785,15 @@ async function sendJarvisMessage() {
     );
 
 
-    const jarvisState =
+    const state =
         document.getElementById(
             "jarvisState"
         );
 
 
-    if (jarvisState) {
+    if (state) {
 
-        jarvisState.textContent =
+        state.textContent =
             "THINKING";
 
     }
@@ -837,7 +816,8 @@ async function sendJarvisMessage() {
 
         const response =
             await fetch(
-                `${API_BASE}/api/jarvis`,
+                API_BASE +
+                "/api/jarvis",
                 {
 
                     method:
@@ -939,9 +919,9 @@ async function sendJarvisMessage() {
     }
 
 
-    if (jarvisState) {
+    if (state) {
 
-        jarvisState.textContent =
+        state.textContent =
             "READY";
 
     }
