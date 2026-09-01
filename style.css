@@ -14,9 +14,15 @@ body {
     color: #00ffff;
 }
 
-/* =========================
-   MAIN CAMERA
-   ========================= */
+#app {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+/* CAMERA */
 
 #camera {
     position: absolute;
@@ -29,9 +35,7 @@ body {
     background: #000;
 }
 
-/* =========================
-   HAND TRACKING
-   ========================= */
+/* HAND TRACKING */
 
 #handCanvas {
     position: absolute;
@@ -44,11 +48,9 @@ body {
     pointer-events: none;
 }
 
-/* =========================
-   THREE.JS HOLOGRAM
-   ========================= */
+/* THREE.JS */
 
-#threeCanvas {
+#scene {
     position: absolute;
     inset: 0;
     width: 100%;
@@ -57,22 +59,23 @@ body {
     pointer-events: none;
 }
 
-/* =========================
-   HUD
-   ========================= */
+/* HUD */
 
 #hud {
     position: absolute;
     inset: 0;
-    z-index: 10;
-    pointer-events: none;
+    z-index: 20;
+
+    /*
+       IMPORTANT:
+       The HUD itself can receive mouse clicks.
+    */
+    pointer-events: auto;
 }
 
-/* =========================
-   TOP BAR
-   ========================= */
+/* TOP BAR */
 
-#topBar {
+.topbar {
     position: absolute;
     top: 15px;
     left: 50%;
@@ -80,13 +83,13 @@ body {
 
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 15px;
 
     padding: 8px 14px;
 
-    background: rgba(0, 10, 15, 0.65);
-    border: 1px solid rgba(0, 255, 255, 0.35);
-    border-radius: 12px;
+    background: rgba(0, 10, 15, 0.75);
+    border: 1px solid rgba(0, 255, 255, 0.4);
+    border-radius: 10px;
 
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
@@ -94,109 +97,101 @@ body {
     pointer-events: auto;
 }
 
-/* =========================
-   JARVIS TITLE
-   ========================= */
-
-#jarvisTitle {
-    font-size: 14px;
+.logo {
+    font-size: 13px;
     font-weight: bold;
     letter-spacing: 2px;
-    white-space: nowrap;
 }
 
-/* =========================
-   STATUS
-   ========================= */
+#systemStatus {
+    font-size: 10px;
+}
 
-#status {
+/* TOOLBARS */
+
+.toolbar {
     position: absolute;
-    top: 15px;
-    left: 15px;
 
-    padding: 7px 11px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
 
-    background: rgba(0, 10, 15, 0.65);
-    border: 1px solid rgba(0, 255, 255, 0.3);
-    border-radius: 8px;
+    z-index: 100;
 
-    font-size: 11px;
-    letter-spacing: 1px;
-
-    backdrop-filter: blur(8px);
+    pointer-events: auto;
 }
 
-/* =========================
-   CAMERA BUTTON
-   ========================= */
+.toolbar.left {
+    left: 15px;
+    top: 70px;
+}
 
-#cameraBtn {
-    padding: 7px 12px;
+.toolbar.right {
+    right: 15px;
+    top: 70px;
+}
 
-    background: rgba(0, 255, 255, 0.08);
-    color: #00ffff;
+/* ALL BUTTONS */
+
+button {
+    appearance: none;
+    -webkit-appearance: none;
 
     border: 1px solid rgba(0, 255, 255, 0.45);
-    border-radius: 8px;
+    border-radius: 7px;
+
+    background: rgba(0, 10, 15, 0.8);
+
+    color: #00ffff;
+
+    padding: 8px 11px;
+
+    font-family: Arial, sans-serif;
+    font-size: 10px;
+    font-weight: bold;
 
     cursor: pointer;
 
-    font-size: 11px;
-    font-weight: bold;
+    user-select: none;
+    -webkit-user-select: none;
+
+    pointer-events: auto;
+
+    position: relative;
+    z-index: 101;
 }
 
-#cameraBtn:hover {
+button:hover {
     background: rgba(0, 255, 255, 0.18);
+    border-color: rgba(0, 255, 255, 0.8);
 }
 
-/* =========================
-   CROSSHAIR
-   ========================= */
-
-#crosshair {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-
-    width: 24px;
-    height: 24px;
-
-    transform: translate(-50%, -50%);
-
-    border: 1px solid rgba(0, 255, 255, 0.45);
-    border-radius: 50%;
-
-    pointer-events: none;
+button:active {
+    transform: scale(0.95);
 }
 
-#crosshair::before,
-#crosshair::after {
-    content: "";
+/* OBJECT MENU */
 
+#objectMenu {
     position: absolute;
 
-    background: rgba(0, 255, 255, 0.6);
+    left: 15px;
+    top: 175px;
+
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+
+    z-index: 100;
+
+    pointer-events: auto;
 }
 
-#crosshair::before {
-    width: 1px;
-    height: 34px;
-
-    top: -6px;
-    left: 11px;
+#objectMenu button {
+    pointer-events: auto;
 }
 
-#crosshair::after {
-    width: 34px;
-    height: 1px;
-
-    left: -6px;
-    top: 11px;
-}
-
-/* =========================
-   RETICLE
-   ========================= */
+/* RETICLE */
 
 #reticle {
     position: absolute;
@@ -214,93 +209,7 @@ body {
     pointer-events: none;
 }
 
-/* =========================
-   RIGHT CONTROL PANEL
-   ========================= */
-
-#controls {
-    position: absolute;
-
-    right: 15px;
-    top: 50%;
-
-    transform: translateY(-50%);
-
-    width: 145px;
-
-    padding: 10px;
-
-    background: rgba(0, 10, 15, 0.68);
-
-    border: 1px solid rgba(0, 255, 255, 0.3);
-    border-radius: 12px;
-
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-
-    pointer-events: auto;
-}
-
-/* =========================
-   CONTROL BUTTONS
-   ========================= */
-
-#controls button,
-.controlButton {
-    width: 100%;
-
-    margin-bottom: 6px;
-
-    padding: 7px 6px;
-
-    background: rgba(0, 255, 255, 0.06);
-    color: #00ffff;
-
-    border: 1px solid rgba(0, 255, 255, 0.28);
-    border-radius: 7px;
-
-    font-size: 10px;
-    font-weight: bold;
-
-    cursor: pointer;
-}
-
-#controls button:last-child {
-    margin-bottom: 0;
-}
-
-#controls button:hover,
-.controlButton:hover {
-    background: rgba(0, 255, 255, 0.16);
-    border-color: rgba(0, 255, 255, 0.6);
-}
-
-#controls button:active,
-.controlButton:active {
-    transform: scale(0.97);
-}
-
-/* =========================
-   OBJECT BUTTONS
-   ========================= */
-
-#objectButtons {
-    display: grid;
-
-    grid-template-columns: 1fr 1fr;
-
-    gap: 5px;
-
-    margin-bottom: 7px;
-}
-
-#objectButtons button {
-    margin-bottom: 0;
-}
-
-/* =========================
-   JARVIS CHAT
-   ========================= */
+/* JARVIS PANEL */
 
 #jarvisPanel {
     position: absolute;
@@ -314,37 +223,37 @@ body {
     display: flex;
     flex-direction: column;
 
-    background: rgba(0, 10, 15, 0.72);
+    background: rgba(0, 10, 15, 0.78);
 
-    border: 1px solid rgba(0, 255, 255, 0.32);
+    border: 1px solid rgba(0, 255, 255, 0.35);
     border-radius: 12px;
 
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
 
+    z-index: 100;
+
     pointer-events: auto;
 }
 
-/* =========================
-   CHAT HEADER
-   ========================= */
-
 #jarvisHeader {
+    display: flex;
+    justify-content: space-between;
+
     padding: 8px 10px;
 
     border-bottom: 1px solid rgba(0, 255, 255, 0.2);
 
-    font-size: 11px;
+    font-size: 10px;
     font-weight: bold;
     letter-spacing: 1px;
 }
 
-/* =========================
-   CHAT MESSAGES
-   ========================= */
-
-#chatMessages {
+#chatOutput {
     flex: 1;
+
+    min-height: 80px;
+    max-height: 170px;
 
     overflow-y: auto;
 
@@ -354,25 +263,26 @@ body {
     line-height: 1.4;
 }
 
-#chatMessages::-webkit-scrollbar {
-    width: 3px;
+.jarvisLine {
+    margin-bottom: 5px;
 }
 
-#chatMessages::-webkit-scrollbar-thumb {
-    background: rgba(0, 255, 255, 0.4);
+.userLine {
+    opacity: 0.7;
 }
 
-/* =========================
-   CHAT INPUT
-   ========================= */
+/* CHAT CONTROLS */
 
-#chatInputArea {
+#chatControls {
     display: flex;
+    align-items: center;
     gap: 5px;
 
     padding: 7px;
 
     border-top: 1px solid rgba(0, 255, 255, 0.2);
+
+    pointer-events: auto;
 }
 
 #chatInput {
@@ -382,42 +292,37 @@ body {
 
     padding: 7px;
 
-    background: rgba(0, 0, 0, 0.45);
-
-    color: #00ffff;
-
-    border: 1px solid rgba(0, 255, 255, 0.3);
-    border-radius: 6px;
-
-    outline: none;
-
-    font-size: 10px;
-}
-
-#chatInput:focus {
-    border-color: rgba(0, 255, 255, 0.7);
-}
-
-#sendBtn,
-#micBtn {
-    width: 30px;
-    height: 30px;
-
-    background: rgba(0, 255, 255, 0.08);
+    background: rgba(0, 0, 0, 0.5);
 
     color: #00ffff;
 
     border: 1px solid rgba(0, 255, 255, 0.35);
     border-radius: 6px;
 
-    cursor: pointer;
+    outline: none;
+
+    font-size: 10px;
+
+    pointer-events: auto;
 }
 
-/* =========================
-   BOTTOM STATUS BAR
-   ========================= */
+#chatInput:focus {
+    border-color: rgba(0, 255, 255, 0.8);
+}
 
-#bottomBar {
+#micBtn,
+#sendBtn {
+    width: 30px;
+    height: 30px;
+
+    padding: 0;
+
+    pointer-events: auto;
+}
+
+/* STATUS */
+
+#status {
     position: absolute;
 
     left: 50%;
@@ -426,133 +331,57 @@ body {
     transform: translateX(-50%);
 
     display: flex;
-    align-items: center;
     gap: 15px;
 
     padding: 7px 12px;
 
-    background: rgba(0, 10, 15, 0.65);
+    background: rgba(0, 10, 15, 0.75);
 
-    border: 1px solid rgba(0, 255, 255, 0.28);
-    border-radius: 10px;
-
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(0, 255, 255, 0.3);
+    border-radius: 9px;
 
     font-size: 9px;
-    letter-spacing: 0.5px;
+
+    z-index: 100;
 
     pointer-events: none;
 }
 
-/* =========================
-   STATUS ITEMS
-   ========================= */
-
-.statusItem {
+#status span {
     white-space: nowrap;
 }
 
-.statusValue {
-    font-weight: bold;
-}
-
-/* =========================
-   HIDDEN
-   ========================= */
-
-.hidden {
-    display: none !important;
-}
-
-/* =========================
-   MOBILE
-   ========================= */
+/* MOBILE */
 
 @media (max-width: 700px) {
 
-    #controls {
+    .toolbar.left {
+        left: 8px;
+        top: 60px;
+    }
+
+    .toolbar.right {
         right: 8px;
-        width: 115px;
+        top: 60px;
+    }
+
+    #objectMenu {
+        left: 8px;
+        top: 160px;
     }
 
     #jarvisPanel {
         left: 8px;
-        bottom: 50px;
+        bottom: 45px;
         width: 210px;
     }
 
-    #topBar {
-        top: 8px;
-    }
-
     #status {
-        top: 8px;
-        left: 8px;
-    }
-
-    #bottomBar {
         bottom: 7px;
         gap: 8px;
-        padding: 5px 8px;
     }
-}
-/* =========================
-   MAKE HUD CONTROLS CLICKABLE
-   ========================= */
 
-#hud button,
-#hud input,
-.toolbar,
-#objectMenu,
-#jarvisPanel {
-    pointer-events: auto;
-}
-
-.toolbar {
-    position: absolute;
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-}
-
-.toolbar.left {
-    left: 15px;
-    top: 70px;
-}
-
-.toolbar.right {
-    right: 15px;
-    top: 70px;
-}
-
-.toolbar button,
-#objectMenu button {
-    padding: 7px 10px;
-
-    background: rgba(0, 10, 15, 0.75);
-    color: #00ffff;
-
-    border: 1px solid rgba(0, 255, 255, 0.4);
-    border-radius: 7px;
-
-    cursor: pointer;
-
-    font-size: 10px;
-    font-weight: bold;
-}
-
-.toolbar button:hover,
-#objectMenu button:hover {
-    background: rgba(0, 255, 255, 0.18);
-}
-
-#objectMenu {
-    position: absolute;
-    left: 15px;
-    top: 175px;
-
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
+    .topbar {
+        top: 8px;
+    }
 }
