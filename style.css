@@ -497,3 +497,62 @@ body {
         padding: 5px 8px;
     }
 }
+/* =========================
+   MAKE HUD CONTROLS CLICKABLE
+   ========================= */
+
+#hud button,
+#hud input,
+.toolbar,
+#objectMenu,
+#jarvisPanel {
+    pointer-events: auto;
+}
+
+.toolbar {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.toolbar.left {
+    left: 15px;
+    top: 70px;
+}
+
+.toolbar.right {
+    right: 15px;
+    top: 70px;
+}
+
+.toolbar button,
+#objectMenu button {
+    padding: 7px 10px;
+
+    background: rgba(0, 10, 15, 0.75);
+    color: #00ffff;
+
+    border: 1px solid rgba(0, 255, 255, 0.4);
+    border-radius: 7px;
+
+    cursor: pointer;
+
+    font-size: 10px;
+    font-weight: bold;
+}
+
+.toolbar button:hover,
+#objectMenu button:hover {
+    background: rgba(0, 255, 255, 0.18);
+}
+
+#objectMenu {
+    position: absolute;
+    left: 15px;
+    top: 175px;
+
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
