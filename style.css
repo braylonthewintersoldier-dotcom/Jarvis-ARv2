@@ -4,24 +4,13 @@
 
 html,
 body {
-
     margin: 0;
-
     width: 100%;
-
     height: 100%;
-
     overflow: hidden;
-
     background: black;
-
-    font-family:
-        Arial,
-        Helvetica,
-        sans-serif;
-
+    font-family: Arial, Helvetica, sans-serif;
     color: #00eaff;
-
 }
 
 
@@ -30,15 +19,10 @@ body {
 ================================= */
 
 #app {
-
     position: relative;
-
     width: 100vw;
-
     height: 100vh;
-
     overflow: hidden;
-
 }
 
 
@@ -47,21 +31,16 @@ body {
 ================================= */
 
 #camera {
-
     position: absolute;
-
     inset: 0;
-
     width: 100%;
-
     height: 100%;
-
     object-fit: cover;
 
-    transform: scaleX(-1);
+    /* FIXED: camera is no longer mirrored */
+    transform: none;
 
     z-index: 0;
-
 }
 
 
@@ -70,19 +49,12 @@ body {
 ================================= */
 
 #handCanvas {
-
     position: absolute;
-
     inset: 0;
-
     width: 100%;
-
     height: 100%;
-
     z-index: 2;
-
     pointer-events: none;
-
 }
 
 
@@ -91,19 +63,12 @@ body {
 ================================= */
 
 #scene {
-
     position: absolute;
-
     inset: 0;
-
     width: 100%;
-
     height: 100%;
-
     z-index: 3;
-
     pointer-events: none;
-
 }
 
 
@@ -112,15 +77,10 @@ body {
 ================================= */
 
 #hud {
-
     position: absolute;
-
     inset: 0;
-
     z-index: 10;
-
     pointer-events: none;
-
 }
 
 
@@ -129,48 +89,32 @@ body {
 ================================= */
 
 .topbar {
-
     position: absolute;
-
     top: 15px;
-
     left: 18px;
-
     right: 18px;
 
     display: flex;
-
     justify-content: space-between;
-
     align-items: center;
-
 }
 
 
 .logo {
-
     font-size: 18px;
-
     font-weight: bold;
-
     letter-spacing: 4px;
-
     opacity: 0.85;
 
     text-shadow:
         0 0 8px #00eaff;
-
 }
 
 
 #systemStatus {
-
     font-size: 9px;
-
     letter-spacing: 1px;
-
     opacity: 0.75;
-
 }
 
 
@@ -179,33 +123,24 @@ body {
 ================================= */
 
 .toolbar {
-
     position: absolute;
-
     top: 60px;
 
     display: flex;
-
     flex-direction: column;
-
     gap: 5px;
 
     pointer-events: auto;
-
 }
 
 
 .toolbar.left {
-
     left: 12px;
-
 }
 
 
 .toolbar.right {
-
     right: 12px;
-
 }
 
 
@@ -214,11 +149,8 @@ body {
 ================================= */
 
 button {
-
     width: 42px;
-
     height: 32px;
-
     padding: 0;
 
     border: 1px solid rgba(
@@ -238,9 +170,7 @@ button {
     color: #00eaff;
 
     font-size: 8px;
-
     font-weight: bold;
-
     letter-spacing: 1px;
 
     cursor: pointer;
@@ -250,19 +180,16 @@ button {
     transition:
         background 0.15s,
         box-shadow 0.15s;
-
 }
 
 
 button:hover {
-
-    background:
-        rgba(
-            0,
-            234,
-            255,
-            0.15
-        );
+    background: rgba(
+        0,
+        234,
+        255,
+        0.15
+    );
 
     box-shadow:
         0 0 8px
@@ -272,7 +199,6 @@ button:hover {
             255,
             0.5
         );
-
 }
 
 
@@ -281,32 +207,23 @@ button:hover {
 ================================= */
 
 #objectMenu {
-
     position: absolute;
 
     top: 60px;
-
     left: 65px;
 
     display: flex;
-
     gap: 4px;
 
     pointer-events: auto;
-
     opacity: 0.75;
-
 }
 
 
 #objectMenu button {
-
     width: 35px;
-
     height: 25px;
-
     font-size: 7px;
-
 }
 
 
@@ -315,15 +232,12 @@ button:hover {
 ================================= */
 
 #reticle {
-
     position: absolute;
 
     width: 15px;
-
     height: 15px;
 
     border: 1px solid #00eaff;
-
     border-radius: 50%;
 
     transform:
@@ -333,7 +247,6 @@ button:hover {
 
     box-shadow:
         0 0 8px #00eaff;
-
 }
 
 
@@ -342,11 +255,9 @@ button:hover {
 ================================= */
 
 #jarvisPanel {
-
     position: absolute;
 
     left: 50%;
-
     bottom: 48px;
 
     transform:
@@ -357,13 +268,12 @@ button:hover {
         55vw
     );
 
-    background:
-        rgba(
-            0,
-            5,
-            10,
-            0.58
-        );
+    background: rgba(
+        0,
+        5,
+        10,
+        0.58
+    );
 
     border:
         1px solid
@@ -380,7 +290,6 @@ button:hover {
     pointer-events: auto;
 
     opacity: 0.82;
-
 }
 
 
@@ -389,13 +298,11 @@ button:hover {
 ================================= */
 
 #jarvisHeader {
-
     height: 25px;
 
     display: flex;
 
     justify-content: space-between;
-
     align-items: center;
 
     padding: 0 9px;
@@ -410,9 +317,7 @@ button:hover {
         );
 
     font-size: 9px;
-
     letter-spacing: 2px;
-
 }
 
 
@@ -421,7 +326,6 @@ button:hover {
 ================================= */
 
 #chatOutput {
-
     height: 55px;
 
     overflow-y: auto;
@@ -429,23 +333,17 @@ button:hover {
     padding: 7px;
 
     font-size: 9px;
-
     line-height: 1.4;
-
 }
 
 
 .jarvisLine {
-
     margin-bottom: 4px;
-
 }
 
 
 .userLine {
-
     color: white;
-
 }
 
 
@@ -454,7 +352,6 @@ button:hover {
 ================================= */
 
 #chatControls {
-
     display: flex;
 
     height: 30px;
@@ -467,18 +364,14 @@ button:hover {
             255,
             0.2
         );
-
 }
 
 
 #chatInput {
-
     flex: 1;
-
     min-width: 0;
 
     border: 0;
-
     outline: 0;
 
     background: transparent;
@@ -488,15 +381,12 @@ button:hover {
     padding: 7px;
 
     font-size: 9px;
-
 }
 
 
 #micBtn,
 #sendBtn {
-
     width: 35px;
-
     height: 30px;
 
     border: 0;
@@ -509,7 +399,6 @@ button:hover {
             255,
             0.3
         );
-
 }
 
 
@@ -518,11 +407,9 @@ button:hover {
 ================================= */
 
 #status {
-
     position: absolute;
 
     bottom: 12px;
-
     left: 50%;
 
     transform:
@@ -534,13 +421,12 @@ button:hover {
 
     padding: 5px 10px;
 
-    background:
-        rgba(
-            0,
-            5,
-            10,
-            0.35
-        );
+    background: rgba(
+        0,
+        5,
+        10,
+        0.35
+    );
 
     border:
         1px solid
@@ -552,18 +438,14 @@ button:hover {
         );
 
     font-size: 7px;
-
     letter-spacing: 1px;
 
     opacity: 0.7;
-
 }
 
 
 #status b {
-
     color: white;
-
 }
 
 
@@ -574,18 +456,15 @@ button:hover {
 @media(max-width: 700px) {
 
     .toolbar {
-
         transform:
             scale(0.85);
 
         transform-origin:
             top;
-
     }
 
 
     #objectMenu {
-
         left: 52px;
 
         transform:
@@ -593,25 +472,18 @@ button:hover {
 
         transform-origin:
             top left;
-
     }
 
 
     #jarvisPanel {
-
         width: 58vw;
-
         bottom: 45px;
-
     }
 
 
     #status {
-
         gap: 8px;
-
         font-size: 6px;
-
     }
 
 }
