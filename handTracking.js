@@ -857,3 +857,7 @@ function processTwoHands(
         "TWO HAND";
 
 }
+// Start JARVIS hand tracking
+window.addEventListener("load", () => {
+    startHandTracking();
+});
