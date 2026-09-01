@@ -1,11 +1,166 @@
-jarvis-ar/
-│
-├── index.html
-├── app.js
-├── style.css
-│
-├── models/
-│   └── ...
-│
-└── backend/
-    └── ...
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>JARVIS AR</title>
+
+    <link rel="stylesheet" href="style.css">
+
+    <!-- THREE.JS -->
+    <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
+
+    <!-- MEDIAPIPE -->
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js"></script>
+</head>
+
+<body>
+
+<div id="app">
+
+    <!-- CAMERA -->
+    <video id="camera" autoplay playsinline></video>
+
+    <!-- THREE.JS -->
+    <canvas id="scene"></canvas>
+
+    <!-- HUD -->
+    <div id="hud">
+
+        <div class="top-bar">
+            <div class="logo">
+                JARVIS
+                <span>AR</span>
+            </div>
+
+            <div id="system-status">
+                SYSTEM ONLINE
+            </div>
+        </div>
+
+        <div class="crosshair">
+            <div class="crosshair-horizontal"></div>
+            <div class="crosshair-vertical"></div>
+        </div>
+
+        <div class="reticle" id="reticle"></div>
+
+        <!-- LEFT CONTROLS -->
+        <div class="controls left">
+
+            <button id="cameraButton">
+                CAMERA
+            </button>
+
+            <button id="spawnCube">
+                CUBE
+            </button>
+
+            <button id="spawnSphere">
+                SPHERE
+            </button>
+
+            <button id="spawnPyramid">
+                PYRAMID
+            </button>
+
+            <button id="spawnCylinder">
+                CYLINDER
+            </button>
+
+            <button id="spawnTorus">
+                TORUS
+            </button>
+
+        </div>
+
+        <!-- RIGHT CONTROLS -->
+        <div class="controls right">
+
+            <button id="deleteButton">
+                DELETE
+            </button>
+
+            <button id="duplicateButton">
+                DUPLICATE
+            </button>
+
+            <button id="resetButton">
+                RESET
+            </button>
+
+            <button id="physicsButton">
+                PHYSICS
+            </button>
+
+        </div>
+
+        <!-- JARVIS CHAT -->
+        <div id="jarvis-panel">
+
+            <div id="jarvis-title">
+                JARVIS
+            </div>
+
+            <div id="chat-output">
+                <div class="jarvis-message">
+                    JARVIS ONLINE
+                </div>
+
+                <div class="jarvis-message">
+                    Ready.
+                </div>
+            </div>
+
+            <div id="chat-input-area">
+
+                <input
+                    id="chat-input"
+                    type="text"
+                    placeholder="Ask JARVIS..."
+                >
+
+                <button id="send-button">
+                    SEND
+                </button>
+
+            </div>
+
+        </div>
+
+        <!-- BOTTOM STATUS -->
+        <div id="status-bar">
+
+            <div>
+                SYSTEM:
+                <span id="systemText">ONLINE</span>
+            </div>
+
+            <div>
+                HANDS:
+                <span id="handText">0</span>
+            </div>
+
+            <div>
+                OBJECTS:
+                <span id="objectText">0</span>
+            </div>
+
+            <div>
+                MODE:
+                <span id="modeText">IDLE</span>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script src="app.js"></script>
+
+</body>
+</html>
