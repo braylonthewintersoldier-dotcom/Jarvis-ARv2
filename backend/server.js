@@ -1,12 +1,20 @@
-const express = require("express");
-const path = require("path");
+import express from "express";
+import path from "path";
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const app = express();
 
 const PORT = process.env.PORT || 3000;
 
 // Serve the JARVIS frontend
-app.use(express.static(path.join(__dirname, "..")));
+app.use(
+    express.static(
+        path.join(__dirname, "..")
+    )
+);
 
 // Backend status
 app.get("/api/status", (req, res) => {
@@ -15,13 +23,19 @@ app.get("/api/status", (req, res) => {
     });
 });
 
-// Send index.html for the main website
+// Main JARVIS website
 app.get("/", (req, res) => {
     res.sendFile(
-        path.join(__dirname, "..", "index.html")
+        path.join(
+            __dirname,
+            "..",
+            "index.html"
+        )
     );
 });
 
 app.listen(PORT, () => {
-    console.log(`JARVIS running on port ${PORT}`);
+    console.log(
+        `JARVIS running on port ${PORT}`
+    );
 });
