@@ -13,82 +13,141 @@ const JARVIS_HANDS = {
 };
 
 
-// START
+// =================================
+// START HAND TRACKING
+// =================================
 
 async function startHandTracking() {
 
     console.log("JARVIS: Starting hand tracking");
 
-    const video = document.getElementById("camera");
-    const canvas = document.getElementById("handCanvas");
+    const video =
+        document.getElementById("camera");
+
+    const canvas =
+        document.getElementById("handCanvas");
 
     if (!video) {
-        console.error("JARVIS: Camera video not found");
+        console.error(
+            "JARVIS: Camera video not found"
+        );
         return;
     }
 
     if (!canvas) {
-        console.error("JARVIS: Hand canvas not found");
+        console.error(
+            "JARVIS: Hand canvas not found"
+        );
         return;
     }
 
     if (typeof Hands === "undefined") {
-        console.error("JARVIS: MediaPipe Hands not loaded");
+        console.error(
+            "JARVIS: MediaPipe Hands not loaded"
+        );
         return;
     }
 
     if (typeof Camera === "undefined") {
-        console.error("JARVIS: MediaPipe Camera not loaded");
+        console.error(
+            "JARVIS: MediaPipe Camera not loaded"
+        );
         return;
     }
 
-    const ctx = canvas.getContext("2d");
+
+    const ctx =
+        canvas.getContext("2d");
+
 
     canvas.width = 1280;
     canvas.height = 720;
 
-    JARVIS_HANDS.hands = new Hands({
-        locateFile: function (file) {
-            return "https://cdn.jsdelivr.net/npm/@mediapipe/hands/" + file;
-        }
-    });
+
+    // Create MediaPipe Hands
+
+    JARVIS_HANDS.hands =
+        new Hands({
+            locateFile: function (file) {
+
+                return (
+                    "https://cdn.jsdelivr.net/npm/" +
+                    "@mediapipe/hands/" +
+                    file
+                );
+
+            }
+        });
+
 
     JARVIS_HANDS.hands.setOptions({
+
         maxNumHands: 2,
+
         modelComplexity: 1,
+
         minDetectionConfidence: 0.5,
+
         minTrackingConfidence: 0.5
+
     });
 
-    JARVIS_HANDS.hands.onResults(function (results) {
-        processHands(results, ctx, canvas);
-    });
 
-    JARVIS_HANDS.camera = new Camera(video, {
-        onFrame: async function () {
+    JARVIS_HANDS.hands.onResults(
+        function (results) {
 
-            if (!video.videoWidth) {
-                return;
-            }
+            processHands(
+                results,
+                ctx,
+                canvas
+            );
 
-            await JARVIS_HANDS.hands.send({
-                image: video
-            });
+        }
+    );
 
-        },
-        width: 1280,
-        height: 720
-    });
+
+    // MediaPipe camera
+
+    JARVIS_HANDS.camera =
+        new Camera(video, {
+
+            onFrame: async function () {
+
+                if (!video.videoWidth) {
+                    return;
+                }
+
+                await JARVIS_HANDS.hands.send({
+                    image: video
+                });
+
+            },
+
+            width: 1280,
+
+            height: 720
+
+        });
+
 
     JARVIS_HANDS.camera.start();
 
-    console.log("JARVIS: Hand tracking started");
+
+    console.log(
+        "JARVIS: Hand tracking started"
+    );
 }
 
 
+// =================================
 // PROCESS HANDS
+// =================================
 
-function processHands(results, ctx, canvas) {
+function processHands(
+    results,
+    ctx,
+    canvas
+) {
 
     ctx.clearRect(
         0,
@@ -97,28 +156,53 @@ function processHands(results, ctx, canvas) {
         canvas.height
     );
 
+
     const landmarks =
         results.multiHandLandmarks || [];
+
 
     JARVIS_HANDS.detected =
         landmarks.length;
 
+
+    // Update hand counter
+
     const handText =
-        document.getElementById("handText");
+        document.getElementById(
+            "handText"
+        );
+
 
     if (handText) {
 
-        handText.textContent =
-            landmarks.length > 0
-                ? landmarks.length + " HAND" +
-                  (landmarks.length === 1 ? "" : "S")
-                : "NO HAND";
+        if (landmarks.length === 0) {
+
+            handText.textContent =
+                "NO HAND";
+
+        } else {
+
+            handText.textContent =
+                landmarks.length +
+                " HAND" +
+                (
+                    landmarks.length === 1
+                        ? ""
+                        : "S"
+                );
+
+        }
+
     }
 
 
-    // DRAW HANDS
+    // Draw every detected hand
 
-    for (let i = 0; i < landmarks.length; i++) {
+    for (
+        let i = 0;
+        i < landmarks.length;
+        i++
+    ) {
 
         drawHand(
             ctx,
@@ -129,17 +213,32 @@ function processHands(results, ctx, canvas) {
     }
 
 
+    // No hands
+
     if (landmarks.length === 0) {
 
-        JARVIS_HANDS.twoHandStartDistance = null;
-        JARVIS_HANDS.twoHandStartScale = null;
-        JARVIS_HANDS.twoHandStartAngle = null;
+        JARVIS_HANDS.twoHandStartDistance =
+            null;
 
-        if (JARVIS_HANDS.grabbing) {
+        JARVIS_HANDS.twoHandStartScale =
+            null;
 
-            JARVIS_HANDS.grabbing = false;
-            JARVIS_HANDS.grabbed = null;
-            JARVIS_HANDS.lastPosition = null;
+        JARVIS_HANDS.twoHandStartAngle =
+            null;
+
+
+        if (
+            JARVIS_HANDS.grabbing
+        ) {
+
+            JARVIS_HANDS.grabbing =
+                false;
+
+            JARVIS_HANDS.grabbed =
+                null;
+
+            JARVIS_HANDS.lastPosition =
+                null;
 
         }
 
@@ -150,14 +249,16 @@ function processHands(results, ctx, canvas) {
     const firstHand =
         landmarks[0];
 
+
     const indexTip =
         firstHand[8];
+
 
     const thumbTip =
         firstHand[4];
 
 
-    // RETICLE
+    // Draw reticle
 
     drawReticle(
         ctx,
@@ -166,7 +267,7 @@ function processHands(results, ctx, canvas) {
     );
 
 
-    // PINCH
+    // Detect pinch
 
     const isPinching =
         pinching(
@@ -175,9 +276,14 @@ function processHands(results, ctx, canvas) {
         );
 
 
-    // GRAB EXISTING OBJECT
+    // =================================
+    // GRAB
+    // =================================
 
-    if (isPinching && !JARVIS_HANDS.grabbing) {
+    if (
+        isPinching &&
+        !JARVIS_HANDS.grabbing
+    ) {
 
         const world =
             handToWorld(
@@ -185,29 +291,47 @@ function processHands(results, ctx, canvas) {
                 canvas
             );
 
+
         const object =
-            closestObject(world);
+            closestObject(
+                world
+            );
+
 
         if (object) {
 
-            JARVIS_HANDS.grabbing = true;
-            JARVIS_HANDS.grabbed = object;
-            JARVIS_HANDS.lastPosition = world;
+            JARVIS_HANDS.grabbing =
+                true;
 
-            if (window.JARVIS_SCENE) {
+            JARVIS_HANDS.grabbed =
+                object;
+
+            JARVIS_HANDS.lastPosition =
+                world;
+
+
+            if (
+                window.JARVIS_SCENE
+            ) {
 
                 JARVIS_SCENE.selected =
                     object;
+
             }
+
 
             console.log(
                 "JARVIS: Object grabbed"
             );
+
         }
+
     }
 
 
-    // MOVE OBJECT
+    // =================================
+    // MOVE
+    // =================================
 
     if (
         isPinching &&
@@ -221,8 +345,10 @@ function processHands(results, ctx, canvas) {
                 canvas
             );
 
+
         const object =
             JARVIS_HANDS.grabbed;
+
 
         object.position.x =
             world.x;
@@ -233,31 +359,46 @@ function processHands(results, ctx, canvas) {
         object.position.z =
             world.z;
 
+
         JARVIS_HANDS.lastPosition =
             world;
+
     }
 
 
-    // RELEASE OBJECT
+    // =================================
+    // RELEASE
+    // =================================
 
     if (
         !isPinching &&
         JARVIS_HANDS.grabbing
     ) {
 
-        JARVIS_HANDS.grabbing = false;
-        JARVIS_HANDS.grabbed = null;
-        JARVIS_HANDS.lastPosition = null;
+        JARVIS_HANDS.grabbing =
+            false;
+
+        JARVIS_HANDS.grabbed =
+            null;
+
+        JARVIS_HANDS.lastPosition =
+            null;
+
 
         console.log(
             "JARVIS: Object released"
         );
+
     }
 
 
-    // TWO HAND CONTROL
+    // =================================
+    // TWO HANDS
+    // =================================
 
-    if (landmarks.length >= 2) {
+    if (
+        landmarks.length >= 2
+    ) {
 
         processTwoHands(
             landmarks[0],
@@ -267,81 +408,126 @@ function processHands(results, ctx, canvas) {
 
     } else {
 
-        JARVIS_HANDS.twoHandStartDistance = null;
-        JARVIS_HANDS.twoHandStartScale = null;
-        JARVIS_HANDS.twoHandStartAngle = null;
+        JARVIS_HANDS.twoHandStartDistance =
+            null;
+
+        JARVIS_HANDS.twoHandStartScale =
+            null;
+
+        JARVIS_HANDS.twoHandStartAngle =
+            null;
 
     }
 
 }
 
 
+// =================================
 // DRAW HAND
+// =================================
 
-function drawHand(ctx, landmarks, canvas) {
+function drawHand(
+    ctx,
+    landmarks,
+    canvas
+) {
 
     const connections = [
-        [0,1],
-        [1,2],
-        [2,3],
-        [3,4],
 
-        [0,5],
-        [5,6],
-        [6,7],
-        [7,8],
+        [0, 1],
+        [1, 2],
+        [2, 3],
+        [3, 4],
 
-        [0,9],
-        [9,10],
-        [10,11],
-        [11,12],
+        [0, 5],
+        [5, 6],
+        [6, 7],
+        [7, 8],
 
-        [0,13],
-        [13,14],
-        [14,15],
-        [15,16],
+        [0, 9],
+        [9, 10],
+        [10, 11],
+        [11, 12],
 
-        [0,17],
-        [17,18],
-        [18,19],
-        [19,20],
+        [0, 13],
+        [13, 14],
+        [14, 15],
+        [15, 16],
 
-        [5,9],
-        [9,13],
-        [13,17]
+        [0, 17],
+        [17, 18],
+        [18, 19],
+        [19, 20],
+
+        [5, 9],
+        [9, 13],
+        [13, 17]
+
     ];
 
 
-    ctx.lineWidth = 3;
-    ctx.strokeStyle = "#00ffff";
+    // Lines
 
-    for (const connection of connections) {
+    ctx.lineWidth = 3;
+
+    ctx.strokeStyle =
+        "#00ffff";
+
+
+    for (
+        const connection
+        of connections
+    ) {
 
         const a =
-            landmarks[connection[0]];
+            landmarks[
+                connection[0]
+            ];
 
         const b =
-            landmarks[connection[1]];
+            landmarks[
+                connection[1]
+            ];
+
 
         ctx.beginPath();
+
+
+        /*
+         * IMPORTANT:
+         *
+         * Do NOT flip X here.
+         *
+         * The camera is intentionally
+         * unmirrored.
+         */
 
         ctx.moveTo(
             a.x * canvas.width,
             a.y * canvas.height
         );
 
+
         ctx.lineTo(
             b.x * canvas.width,
             b.y * canvas.height
         );
 
+
         ctx.stroke();
+
     }
 
 
-    for (const point of landmarks) {
+    // Points
+
+    for (
+        const point
+        of landmarks
+    ) {
 
         ctx.beginPath();
+
 
         ctx.arc(
             point.x * canvas.width,
@@ -351,7 +537,11 @@ function drawHand(ctx, landmarks, canvas) {
             Math.PI * 2
         );
 
-        ctx.fillStyle = "#00ffff";
+
+        ctx.fillStyle =
+            "#00ffff";
+
+
         ctx.fill();
 
     }
@@ -359,17 +549,28 @@ function drawHand(ctx, landmarks, canvas) {
 }
 
 
+// =================================
 // RETICLE
+// =================================
 
-function drawReticle(ctx, point, canvas) {
+function drawReticle(
+    ctx,
+    point,
+    canvas
+) {
 
     const x =
-        point.x * canvas.width;
+        point.x *
+        canvas.width;
+
 
     const y =
-        point.y * canvas.height;
+        point.y *
+        canvas.height;
+
 
     ctx.beginPath();
+
 
     ctx.arc(
         x,
@@ -379,16 +580,27 @@ function drawReticle(ctx, point, canvas) {
         Math.PI * 2
     );
 
-    ctx.strokeStyle = "#ffffff";
+
+    ctx.strokeStyle =
+        "#ffffff";
+
+
     ctx.lineWidth = 2;
+
+
     ctx.stroke();
 
 }
 
 
+// =================================
 // DISTANCE
+// =================================
 
-function distance3D(a, b) {
+function distance3D(
+    a,
+    b
+) {
 
     const dx =
         a.x - b.x;
@@ -400,17 +612,24 @@ function distance3D(a, b) {
         (a.z || 0) -
         (b.z || 0);
 
+
     return Math.sqrt(
         dx * dx +
         dy * dy +
         dz * dz
     );
+
 }
 
 
+// =================================
 // PINCH
+// =================================
 
-function pinching(thumb, index) {
+function pinching(
+    thumb,
+    index
+) {
 
     return (
         distance3D(
@@ -422,43 +641,81 @@ function pinching(thumb, index) {
 }
 
 
+// =================================
 // HAND TO WORLD
+// =================================
 
-function handToWorld(point, canvas) {
+function handToWorld(
+    point,
+    canvas
+) {
+
+    /*
+     * Normal orientation.
+     *
+     * X is NOT reversed.
+     */
 
     const x =
         (point.x - 0.5) * 8;
 
+
     const y =
         -(point.y - 0.5) * 5;
+
 
     const z =
         -point.z * 4;
 
+
     return {
+
         x: x,
+
         y: y,
+
         z: z
+
     };
 
 }
 
 
+// =================================
 // FIND CLOSEST OBJECT
+// =================================
 
-function closestObject(position) {
+function closestObject(
+    position
+) {
 
     if (
-        !window.JARVIS_SCENE ||
+        !window.JARVIS_SCENE
+    ) {
+
+        return null;
+
+    }
+
+
+    if (
         !Array.isArray(
             JARVIS_SCENE.objects
         )
     ) {
+
         return null;
+
     }
 
-    let closest = null;
-    let closestDistance = Infinity;
+
+    let closest =
+        null;
+
+
+    let closestDistance =
+        Infinity;
+
 
     for (
         const object
@@ -469,21 +726,26 @@ function closestObject(position) {
             continue;
         }
 
+
         if (!object.position) {
             continue;
         }
+
 
         const dx =
             object.position.x -
             position.x;
 
+
         const dy =
             object.position.y -
             position.y;
 
+
         const dz =
             object.position.z -
             position.z;
+
 
         const distance =
             Math.sqrt(
@@ -492,8 +754,10 @@ function closestObject(position) {
                 dz * dz
             );
 
+
         if (
-            distance < closestDistance &&
+            distance <
+                closestDistance &&
             distance < 1.5
         ) {
 
@@ -502,14 +766,20 @@ function closestObject(position) {
 
             closest =
                 object;
+
         }
+
     }
 
+
     return closest;
+
 }
 
 
-// TWO HANDS
+// =================================
+// TWO HAND CONTROL
+// =================================
 
 function processTwoHands(
     hand1,
@@ -518,11 +788,22 @@ function processTwoHands(
 ) {
 
     if (
-        !window.JARVIS_SCENE ||
+        !window.JARVIS_SCENE
+    ) {
+
+        return;
+
+    }
+
+
+    if (
         !JARVIS_SCENE.selected
     ) {
+
         return;
+
     }
+
 
     const object =
         JARVIS_SCENE.selected;
@@ -531,6 +812,7 @@ function processTwoHands(
     const p1 =
         hand1[8];
 
+
     const p2 =
         hand2[8];
 
@@ -538,8 +820,10 @@ function processTwoHands(
     const dx =
         p1.x - p2.x;
 
+
     const dy =
         p1.y - p2.y;
+
 
     const distance =
         Math.sqrt(
@@ -555,32 +839,58 @@ function processTwoHands(
         );
 
 
+    // Start two-hand gesture
+
     if (
-        JARVIS_HANDS.twoHandStartDistance ===
+        JARVIS_HANDS
+            .twoHandStartDistance ===
         null
     ) {
 
-        JARVIS_HANDS.twoHandStartDistance =
+        JARVIS_HANDS
+            .twoHandStartDistance =
             distance;
 
-        JARVIS_HANDS.twoHandStartScale =
+
+        JARVIS_HANDS
+            .twoHandStartScale =
             object.scale.x;
 
-        JARVIS_HANDS.twoHandStartAngle =
+
+        JARVIS_HANDS
+            .twoHandStartAngle =
             angle;
 
+
         return;
+
     }
 
 
+    // Resize
+
     const scaleRatio =
         distance /
-        JARVIS_HANDS.twoHandStartDistance;
+        JARVIS_HANDS
+            .twoHandStartDistance;
 
 
-    const newScale =
-        JARVIS_HANDS.twoHandStartScale *
+    let newScale =
+        JARVIS_HANDS
+            .twoHandStartScale *
         scaleRatio;
+
+
+    // Prevent disappearing
+
+    newScale =
+        Math.max(
+            0.1,
+            Math.min(
+                newScale,
+                10
+            )
+        );
 
 
     object.scale.set(
@@ -590,9 +900,12 @@ function processTwoHands(
     );
 
 
+    // Rotate
+
     const rotationDifference =
         angle -
-        JARVIS_HANDS.twoHandStartAngle;
+        JARVIS_HANDS
+            .twoHandStartAngle;
 
 
     object.rotation.y =
@@ -601,7 +914,9 @@ function processTwoHands(
 }
 
 
+// =================================
 // AUTO START
+// =================================
 
 window.addEventListener(
     "load",
