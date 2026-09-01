@@ -1,181 +1,105 @@
-```js
-// ======================================
-// JARVIS CONFIG
-// ======================================
+// JARVIS APP
 
-const API_BASE =
-    "PASTE_YOUR_RENDER_BACKEND_URL_HERE";
-
-
-// ======================================
-// START
-// ======================================
-
-document.addEventListener(
-    "DOMContentLoaded",
-    async function () {
-
-        console.log("JARVIS: App starting");
-
-        try {
-
-            if (typeof initScene === "function") {
-                initScene();
-            }
-
-            if (typeof setupVoice === "function") {
-                setupVoice();
-            }
-
-            setupButtons();
-
-            await startCamera();
-
-            console.log("JARVIS: App ready");
-
-        } catch (error) {
-
-            console.error(
-                "JARVIS startup error:",
-                error
-            );
-
-        }
-
-    }
-);
-
-
-// ======================================
-// CAMERA
-// ======================================
+const API_BASE = "PASTE_YOUR_RENDER_BACKEND_URL_HERE";
 
 let currentFacing = "user";
 
+document.addEventListener("DOMContentLoaded", async function () {
 
-async function startCamera() {
-
-    const video =
-        document.getElementById("camera");
-
-
-    if (!video) {
-
-        console.error(
-            "JARVIS: camera element not found"
-        );
-
-        return;
-
-    }
-
-
-    if (
-        !navigator.mediaDevices ||
-        !navigator.mediaDevices.getUserMedia
-    ) {
-
-        console.error(
-            "JARVIS: camera API unavailable"
-        );
-
-        return;
-
-    }
-
+    console.log("JARVIS: App starting");
 
     try {
 
-        const oldStream =
-            video.srcObject;
+        if (typeof initScene === "function") {
+            initScene();
+        }
+
+        if (typeof setupVoice === "function") {
+            setupVoice();
+        }
+
+        setupButtons();
+
+        await startCamera();
+
+        console.log("JARVIS: App ready");
+
+    } catch (error) {
+
+        console.error("JARVIS startup error:", error);
+
+    }
+
+});
 
 
-        if (oldStream) {
+// CAMERA
 
-            oldStream
+async function startCamera() {
+
+    const video = document.getElementById("camera");
+
+    if (!video) {
+        console.error("JARVIS: Camera element not found");
+        return;
+    }
+
+    if (!navigator.mediaDevices) {
+        console.error("JARVIS: Camera API unavailable");
+        return;
+    }
+
+    try {
+
+        if (video.srcObject) {
+
+            video.srcObject
                 .getTracks()
-                .forEach(
-                    function (track) {
-                        track.stop();
-                    }
-                );
+                .forEach(function (track) {
+                    track.stop();
+                });
 
         }
 
-
         const stream =
             await navigator.mediaDevices.getUserMedia({
-
                 video: {
-
-                    facingMode:
-                        currentFacing,
-
+                    facingMode: currentFacing,
                     width: {
                         ideal: 1280
                     },
-
                     height: {
                         ideal: 720
                     }
-
                 },
-
                 audio: false
-
             });
 
+        video.srcObject = stream;
 
-        video.srcObject =
-            stream;
-
-
-        video.setAttribute(
-            "playsinline",
-            ""
-        );
-
-
-        video.muted =
-            true;
-
+        video.setAttribute("playsinline", "");
+        video.muted = true;
 
         await video.play();
 
-
         const cameraText =
-            document.getElementById(
-                "cameraText"
-            );
-
+            document.getElementById("cameraText");
 
         if (cameraText) {
-
             cameraText.textContent =
                 currentFacing === "user"
                     ? "FRONT"
                     : "BACK";
-
         }
-
 
         const systemText =
-            document.getElementById(
-                "systemText"
-            );
-
+            document.getElementById("systemText");
 
         if (systemText) {
-
-            systemText.textContent =
-                "ONLINE";
-
+            systemText.textContent = "ONLINE";
         }
 
-
-        console.log(
-            "JARVIS: Camera started"
-        );
+        console.log("JARVIS: Camera started");
 
     } catch (error) {
 
@@ -184,20 +108,12 @@ async function startCamera() {
             error
         );
 
-
         const systemText =
-            document.getElementById(
-                "systemText"
-            );
-
+            document.getElementById("systemText");
 
         if (systemText) {
-
-            systemText.textContent =
-                "CAMERA ERROR";
-
+            systemText.textContent = "CAMERA ERROR";
         }
-
 
         addJarvisLine(
             "JARVIS: Camera permission is required."
@@ -208,9 +124,7 @@ async function startCamera() {
 }
 
 
-// ======================================
 // SWITCH CAMERA
-// ======================================
 
 async function switchCamera() {
 
@@ -219,31 +133,22 @@ async function switchCamera() {
             ? "environment"
             : "user";
 
-
     await startCamera();
 
 }
 
 
-// ======================================
-// BUTTON SETUP
-// ======================================
+// BUTTONS
 
 function setupButtons() {
 
-    console.log(
-        "JARVIS: Setting up buttons"
-    );
+    console.log("JARVIS: Setting up buttons");
 
 
-    function connectButton(
-        id,
-        action
-    ) {
+    function connect(id, action) {
 
         const element =
             document.getElementById(id);
-
 
         if (!element) {
 
@@ -253,34 +158,24 @@ function setupButtons() {
             );
 
             return;
-
         }
 
-
-        element.onclick =
-            action;
+        element.onclick = action;
 
     }
 
 
-    // CAMERA
-
-    connectButton(
+    connect(
         "cameraBtn",
         switchCamera
     );
 
 
-    // CUBE
-
-    connectButton(
+    connect(
         "cubeBtn",
         function () {
 
-            if (
-                typeof addObject ===
-                "function"
-            ) {
+            if (typeof addObject === "function") {
 
                 addObject(
                     "cube",
@@ -299,16 +194,11 @@ function setupButtons() {
     );
 
 
-    // SPHERE
-
-    connectButton(
+    connect(
         "sphereBtn",
         function () {
 
-            if (
-                typeof addObject ===
-                "function"
-            ) {
+            if (typeof addObject === "function") {
 
                 addObject(
                     "sphere",
@@ -327,16 +217,11 @@ function setupButtons() {
     );
 
 
-    // CYLINDER
-
-    connectButton(
+    connect(
         "cylinderBtn",
         function () {
 
-            if (
-                typeof addObject ===
-                "function"
-            ) {
+            if (typeof addObject === "function") {
 
                 addObject(
                     "cylinder",
@@ -355,16 +240,11 @@ function setupButtons() {
     );
 
 
-    // PYRAMID
-
-    connectButton(
+    connect(
         "pyramidBtn",
         function () {
 
-            if (
-                typeof addObject ===
-                "function"
-            ) {
+            if (typeof addObject === "function") {
 
                 addObject(
                     "pyramid",
@@ -383,16 +263,11 @@ function setupButtons() {
     );
 
 
-    // TORUS
-
-    connectButton(
+    connect(
         "torusBtn",
         function () {
 
-            if (
-                typeof addObject ===
-                "function"
-            ) {
+            if (typeof addObject === "function") {
 
                 addObject(
                     "torus",
@@ -411,25 +286,14 @@ function setupButtons() {
     );
 
 
-    // DELETE
-
-    connectButton(
+    connect(
         "deleteBtn",
         function () {
 
             if (
-                typeof removeObject !==
-                "function"
-            ) {
-
-                return;
-
-            }
-
-
-            if (
                 window.JARVIS_SCENE &&
-                JARVIS_SCENE.selected
+                JARVIS_SCENE.selected &&
+                typeof removeObject === "function"
             ) {
 
                 removeObject(
@@ -442,9 +306,7 @@ function setupButtons() {
     );
 
 
-    // DUPLICATE
-
-    connectButton(
+    connect(
         "duplicateBtn",
         function () {
 
@@ -461,30 +323,21 @@ function setupButtons() {
     );
 
 
-    // PHYSICS
-
-    connectButton(
+    connect(
         "physicsBtn",
         function () {
 
-            if (
-                !window.JARVIS_SCENE
-            ) {
-
+            if (!window.JARVIS_SCENE) {
                 return;
-
             }
-
 
             JARVIS_SCENE.physics =
                 !JARVIS_SCENE.physics;
-
 
             const modeText =
                 document.getElementById(
                     "modeText"
                 );
-
 
             if (modeText) {
 
@@ -499,9 +352,7 @@ function setupButtons() {
     );
 
 
-    // RESET
-
-    connectButton(
+    connect(
         "resetBtn",
         function () {
 
@@ -518,9 +369,7 @@ function setupButtons() {
     );
 
 
-    // SAVE
-
-    connectButton(
+    connect(
         "saveBtn",
         function () {
 
@@ -537,9 +386,7 @@ function setupButtons() {
     );
 
 
-    // LOAD
-
-    connectButton(
+    connect(
         "loadBtn",
         function () {
 
@@ -556,9 +403,7 @@ function setupButtons() {
     );
 
 
-    // EXPORT
-
-    connectButton(
+    connect(
         "exportBtn",
         function () {
 
@@ -575,9 +420,7 @@ function setupButtons() {
     );
 
 
-    // MICROPHONE
-
-    connectButton(
+    connect(
         "micBtn",
         function () {
 
@@ -594,21 +437,16 @@ function setupButtons() {
     );
 
 
-    // SEND
-
-    connectButton(
+    connect(
         "sendBtn",
         sendJarvisMessage
     );
 
 
-    // CHAT INPUT
-
     const chatInput =
         document.getElementById(
             "chatInput"
         );
-
 
     if (chatInput) {
 
@@ -616,10 +454,7 @@ function setupButtons() {
             "keydown",
             function (event) {
 
-                if (
-                    event.key ===
-                    "Enter"
-                ) {
+                if (event.key === "Enter") {
 
                     event.preventDefault();
 
@@ -633,9 +468,7 @@ function setupButtons() {
     }
 
 
-    // BUILD
-
-    connectButton(
+    connect(
         "buildBtn",
         function () {
 
@@ -647,16 +480,12 @@ function setupButtons() {
     );
 
 
-    console.log(
-        "JARVIS: Buttons ready"
-    );
+    console.log("JARVIS: Buttons ready");
 
 }
 
 
-// ======================================
-// JARVIS CHAT OUTPUT
-// ======================================
+// CHAT
 
 function addJarvisLine(text) {
 
@@ -665,46 +494,28 @@ function addJarvisLine(text) {
             "chatOutput"
         );
 
-
     if (!output) {
-
-        console.warn(
-            "JARVIS: chatOutput not found"
-        );
-
         return;
-
     }
-
 
     const div =
         document.createElement(
             "div"
         );
 
-
     div.className =
         "jarvisLine";
-
 
     div.textContent =
         text;
 
-
-    output.appendChild(
-        div
-    );
-
+    output.appendChild(div);
 
     output.scrollTop =
         output.scrollHeight;
 
 }
 
-
-// ======================================
-// USER CHAT OUTPUT
-// ======================================
 
 function addUserLine(text) {
 
@@ -713,32 +524,22 @@ function addUserLine(text) {
             "chatOutput"
         );
 
-
     if (!output) {
-
         return;
-
     }
-
 
     const div =
         document.createElement(
             "div"
         );
 
-
     div.className =
         "jarvisLine userLine";
-
 
     div.textContent =
         "YOU: " + text;
 
-
-    output.appendChild(
-        div
-    );
-
+    output.appendChild(div);
 
     output.scrollTop =
         output.scrollHeight;
@@ -746,9 +547,7 @@ function addUserLine(text) {
 }
 
 
-// ======================================
-// SEND JARVIS MESSAGE
-// ======================================
+// SEND MESSAGE
 
 async function sendJarvisMessage() {
 
@@ -757,47 +556,29 @@ async function sendJarvisMessage() {
             "chatInput"
         );
 
-
     if (!input) {
-
         return;
-
     }
-
 
     const text =
         input.value.trim();
 
-
     if (!text) {
-
         return;
-
     }
 
+    input.value = "";
 
-    input.value =
-        "";
-
-
-    addUserLine(
-        text
-    );
-
+    addUserLine(text);
 
     const state =
         document.getElementById(
             "jarvisState"
         );
 
-
     if (state) {
-
-        state.textContent =
-            "THINKING";
-
+        state.textContent = "THINKING";
     }
-
 
     try {
 
@@ -813,37 +594,28 @@ async function sendJarvisMessage() {
 
         }
 
-
         const response =
             await fetch(
                 API_BASE +
                 "/api/jarvis",
                 {
-
-                    method:
-                        "POST",
+                    method: "POST",
 
                     headers: {
-
                         "Content-Type":
                             "application/json"
-
                     },
 
                     body:
                         JSON.stringify({
-
-                            message:
-                                text,
+                            message: text,
 
                             scene:
                                 typeof getProjectData ===
                                 "function"
                                     ? getProjectData()
                                     : {}
-
                         })
-
                 }
             );
 
@@ -888,7 +660,6 @@ async function sendJarvisMessage() {
                 data.reply
             );
 
-
             if (
                 typeof speakJarvis ===
                 "function"
@@ -902,14 +673,12 @@ async function sendJarvisMessage() {
 
         }
 
-    }
-    catch (error) {
+    } catch (error) {
 
         console.error(
             "JARVIS chat error:",
             error
         );
-
 
         addJarvisLine(
             "JARVIS: " +
@@ -920,11 +689,7 @@ async function sendJarvisMessage() {
 
 
     if (state) {
-
-        state.textContent =
-            "READY";
-
+        state.textContent = "READY";
     }
 
 }
-```
