@@ -1,33 +1,73 @@
-```javascript
+```js
+// ======================================
+// JARVIS HAND TRACKING
+// ======================================
+
 const JARVIS_HANDS = {
+
     hands: null,
+
     camera: null,
+
     detected: 0,
+
     grabbing: false,
+
     grabbed: null,
+
     lastPosition: null,
+
     twoHandStartDistance: null,
+
     twoHandStartScale: 1,
+
     twoHandStartAngle: null
+
 };
 
 
-// ========================================
-// HAND TRACKING CANVAS
-// ========================================
+// ======================================
+// CANVAS
+// ======================================
 
-const handCanvas = document.getElementById("handCanvas");
-const handCtx = handCanvas.getContext("2d");
+const handCanvas =
+    document.getElementById(
+        "handCanvas"
+    );
+
+let handCtx = null;
+
+if (handCanvas) {
+
+    handCtx =
+        handCanvas.getContext("2d");
+
+}
 
 
 function resizeHandCanvas() {
-    const dpr = window.devicePixelRatio || 1;
 
-    handCanvas.width = window.innerWidth * dpr;
-    handCanvas.height = window.innerHeight * dpr;
+    if (!handCanvas || !handCtx) {
+        return;
+    }
 
-    handCanvas.style.width = window.innerWidth + "px";
-    handCanvas.style.height = window.innerHeight + "px";
+    const dpr =
+        window.devicePixelRatio || 1;
+
+
+    handCanvas.width =
+        window.innerWidth * dpr;
+
+    handCanvas.height =
+        window.innerHeight * dpr;
+
+
+    handCanvas.style.width =
+        window.innerWidth + "px";
+
+    handCanvas.style.height =
+        window.innerHeight + "px";
+
 
     handCtx.setTransform(
         dpr,
@@ -37,6 +77,7 @@ function resizeHandCanvas() {
         0,
         0
     );
+
 }
 
 
@@ -48,86 +89,146 @@ window.addEventListener(
 );
 
 
-// ========================================
+// ======================================
 // HAND CONNECTIONS
-// ========================================
+// ======================================
 
 const HAND_CONNECTIONS = [
-    [0, 1],
-    [1, 2],
-    [2, 3],
-    [3, 4],
 
-    [0, 5],
-    [5, 6],
-    [6, 7],
-    [7, 8],
+    [0,1],
+    [1,2],
+    [2,3],
+    [3,4],
 
-    [5, 9],
-    [9, 10],
-    [10, 11],
-    [11, 12],
+    [0,5],
+    [5,6],
+    [6,7],
+    [7,8],
 
-    [9, 13],
-    [13, 14],
-    [14, 15],
-    [15, 16],
+    [5,9],
+    [9,10],
+    [10,11],
+    [11,12],
 
-    [13, 17],
-    [17, 18],
-    [18, 19],
-    [19, 20],
+    [9,13],
+    [13,14],
+    [14,15],
+    [15,16],
 
-    [0, 17]
+    [13,17],
+    [17,18],
+    [18,19],
+    [19,20],
+
+    [0,17]
+
 ];
 
 
-// ========================================
+// ======================================
 // DRAW HAND
-// ========================================
+// ======================================
 
-function drawHand(landmarks) {
+function drawHand(
+    landmarks
+) {
 
-    const width = window.innerWidth;
-    const height = window.innerHeight;
-
-    // Draw skeleton
-    handCtx.beginPath();
-
-    for (const connection of HAND_CONNECTIONS) {
-
-        const a = landmarks[connection[0]];
-        const b = landmarks[connection[1]];
-
-        const ax = (1 - a.x) * width;
-        const ay = a.y * height;
-
-        const bx = (1 - b.x) * width;
-        const by = b.y * height;
-
-        handCtx.moveTo(ax, ay);
-        handCtx.lineTo(bx, by);
+    if (!handCtx) {
+        return;
     }
 
-    handCtx.lineWidth = 2;
-    handCtx.strokeStyle = "rgba(0, 234, 255, 0.9)";
+
+    const width =
+        window.innerWidth;
+
+    const height =
+        window.innerHeight;
+
+
+    handCtx.beginPath();
+
+
+    for (
+        const connection
+        of HAND_CONNECTIONS
+    ) {
+
+        const a =
+            landmarks[
+                connection[0]
+            ];
+
+        const b =
+            landmarks[
+                connection[1]
+            ];
+
+
+        const ax =
+            (1 - a.x) * width;
+
+        const ay =
+            a.y * height;
+
+
+        const bx =
+            (1 - b.x) * width;
+
+        const by =
+            b.y * height;
+
+
+        handCtx.moveTo(
+            ax,
+            ay
+        );
+
+        handCtx.lineTo(
+            bx,
+            by
+        );
+
+    }
+
+
+    handCtx.lineWidth =
+        2;
+
+    handCtx.strokeStyle =
+        "rgba(0,234,255,0.9)";
+
     handCtx.stroke();
 
 
-    // Draw joints
-    for (let i = 0; i < landmarks.length; i++) {
+    for (
+        let i = 0;
+        i < landmarks.length;
+        i++
+    ) {
 
-        const point = landmarks[i];
+        const point =
+            landmarks[i];
 
-        const x = (1 - point.x) * width;
-        const y = point.y * height;
+
+        const x =
+            (1 - point.x) *
+            width;
+
+
+        const y =
+            point.y *
+            height;
+
 
         const radius =
-            i === 4 || i === 8
+            i === 4 ||
+            i === 8
                 ? 5
                 : 3;
 
+
         handCtx.beginPath();
+
 
         handCtx.arc(
             x,
@@ -137,22 +238,35 @@ function drawHand(landmarks) {
             Math.PI * 2
         );
 
+
         handCtx.fillStyle =
-            i === 4 || i === 8
+            i === 4 ||
+            i === 8
                 ? "white"
-                : "rgba(0, 234, 255, 0.95)";
+                : "rgba(0,234,255,0.95)";
+
 
         handCtx.fill();
+
     }
 
 
-    // Index fingertip targeting ring
-    const index = landmarks[8];
+    const index =
+        landmarks[8];
 
-    const ix = (1 - index.x) * width;
-    const iy = index.y * height;
+
+    const ix =
+        (1 - index.x) *
+        width;
+
+
+    const iy =
+        index.y *
+        height;
+
 
     handCtx.beginPath();
+
 
     handCtx.arc(
         ix,
@@ -162,41 +276,61 @@ function drawHand(landmarks) {
         Math.PI * 2
     );
 
-    handCtx.lineWidth = 1;
+
+    handCtx.lineWidth =
+        1;
+
+
     handCtx.strokeStyle =
-        "rgba(0, 234, 255, 0.9)";
+        "rgba(0,234,255,0.9)";
+
 
     handCtx.stroke();
+
 }
 
 
-// ========================================
-// 3D DISTANCE
-// ========================================
+// ======================================
+// DISTANCE
+// ======================================
 
-function distance3D(a, b) {
+function distance3D(
+    a,
+    b
+) {
 
-    const dx = a.x - b.x;
-    const dy = a.y - b.y;
-    const dz = (a.z || 0) - (b.z || 0);
+    const dx =
+        a.x - b.x;
+
+    const dy =
+        a.y - b.y;
+
+    const dz =
+        (a.z || 0) -
+        (b.z || 0);
+
 
     return Math.sqrt(
         dx * dx +
         dy * dy +
         dz * dz
     );
+
 }
 
 
-// ========================================
-// PINCH DETECTION
-// ========================================
+// ======================================
+// PINCH
+// ======================================
 
-function pinching(hand) {
+function pinching(
+    hand
+) {
 
     if (!hand) {
         return false;
     }
+
 
     return (
         distance3D(
@@ -204,14 +338,17 @@ function pinching(hand) {
             hand[8]
         ) < 0.055
     );
+
 }
 
 
-// ========================================
-// HAND TO 3D WORLD
-// ========================================
+// ======================================
+// HAND → WORLD
+// ======================================
 
-function handToWorld(point) {
+function handToWorld(
+    point
+) {
 
     return new THREE.Vector3(
 
@@ -222,24 +359,34 @@ function handToWorld(point) {
         0
 
     );
+
 }
 
 
-// ========================================
-// FIND CLOSEST OBJECT
-// ========================================
+// ======================================
+// FIND OBJECT
+// ======================================
 
-function closestObject(position) {
+function closestObject(
+    position
+) {
 
     if (
         !window.JARVIS_SCENE ||
         !JARVIS_SCENE.objects
     ) {
+
         return null;
+
     }
 
-    let result = null;
-    let smallest = Infinity;
+
+    let result =
+        null;
+
+    let smallest =
+        Infinity;
+
 
     for (
         const object
@@ -250,32 +397,54 @@ function closestObject(position) {
             continue;
         }
 
+
         const distance =
             object.position.distanceTo(
                 position
             );
 
+
         if (
-            distance < smallest
+            distance <
+            smallest
         ) {
 
-            smallest = distance;
-            result = object;
+            smallest =
+                distance;
+
+            result =
+                object;
 
         }
+
     }
 
-    return smallest < 1.5
-        ? result
-        : null;
+
+    if (
+        smallest <
+        1.5
+    ) {
+
+        return result;
+
+    }
+
+
+    return null;
+
 }
 
 
-// ========================================
+// ======================================
 // START HAND TRACKING
-// ========================================
+// ======================================
 
 async function startHandTracking() {
+
+    console.log(
+        "JARVIS: Starting hand tracking..."
+    );
+
 
     try {
 
@@ -284,13 +453,15 @@ async function startHandTracking() {
                 "camera"
             );
 
+
         if (!video) {
 
             console.error(
-                "JARVIS: camera element not found."
+                "JARVIS: camera element missing"
             );
 
             return;
+
         }
 
 
@@ -300,10 +471,11 @@ async function startHandTracking() {
         ) {
 
             console.error(
-                "JARVIS: MediaPipe Hands did not load."
+                "JARVIS: MediaPipe Hands did not load"
             );
 
             return;
+
         }
 
 
@@ -313,10 +485,11 @@ async function startHandTracking() {
         ) {
 
             console.error(
-                "JARVIS: MediaPipe Camera did not load."
+                "JARVIS: MediaPipe Camera did not load"
             );
 
             return;
+
         }
 
 
@@ -338,13 +511,17 @@ async function startHandTracking() {
 
         JARVIS_HANDS.hands.setOptions({
 
-            maxNumHands: 2,
+            maxNumHands:
+                2,
 
-            modelComplexity: 1,
+            modelComplexity:
+                1,
 
-            minDetectionConfidence: 0.65,
+            minDetectionConfidence:
+                0.5,
 
-            minTrackingConfidence: 0.65
+            minTrackingConfidence:
+                0.5
 
         });
 
@@ -356,26 +533,37 @@ async function startHandTracking() {
 
         JARVIS_HANDS.camera =
             new Camera(
+
                 video,
+
                 {
 
-                    width: 1280,
+                    width:
+                        1280,
 
-                    height: 720,
+                    height:
+                        720,
 
                     onFrame:
                         async function() {
 
-                            await
-                            JARVIS_HANDS.hands.send(
-                                {
-                                    image: video
-                                }
-                            );
+                            if (
+                                video.readyState >= 2
+                            ) {
+
+                                await JARVIS_HANDS.hands.send({
+
+                                    image:
+                                        video
+
+                                });
+
+                            }
 
                         }
 
                 }
+
             );
 
 
@@ -387,7 +575,21 @@ async function startHandTracking() {
         );
 
 
-    } catch (error) {
+        const tracking =
+            document.getElementById(
+                "trackingText"
+            );
+
+
+        if (tracking) {
+
+            tracking.textContent =
+                "ACTIVE";
+
+        }
+
+    }
+    catch (error) {
 
         console.error(
             "JARVIS hand tracking error:",
@@ -395,14 +597,26 @@ async function startHandTracking() {
         );
 
     }
+
 }
 
 
-// ========================================
-// PROCESS HAND RESULTS
-// ========================================
+// ======================================
+// PROCESS HANDS
+// ======================================
 
-function processHands(results) {
+function processHands(
+    results
+) {
+
+    if (
+        !handCtx
+    ) {
+
+        return;
+
+    }
+
 
     const width =
         window.innerWidth;
@@ -411,7 +625,6 @@ function processHands(results) {
         window.innerHeight;
 
 
-    // Clear old tracking
     handCtx.clearRect(
         0,
         0,
@@ -421,18 +634,19 @@ function processHands(results) {
 
 
     const hands =
-        results.multiHandLandmarks || [];
+        results.multiHandLandmarks ||
+        [];
 
 
     JARVIS_HANDS.detected =
         hands.length;
 
 
-    // Update hand counter
     const handText =
         document.getElementById(
             "handText"
         );
+
 
     if (handText) {
 
@@ -442,20 +656,21 @@ function processHands(results) {
     }
 
 
-    // Draw every detected hand
     for (
         const hand
         of hands
     ) {
 
-        drawHand(hand);
+        drawHand(
+            hand
+        );
 
     }
 
 
-    // No hands
     if (
-        hands.length === 0
+        hands.length ===
+        0
     ) {
 
         if (
@@ -472,6 +687,7 @@ function processHands(results) {
                 "reticle"
             );
 
+
         if (reticle) {
 
             reticle.style.display =
@@ -479,56 +695,59 @@ function processHands(results) {
 
         }
 
+
         return;
+
     }
 
 
-    // First hand
     const hand =
         hands[0];
+
 
     const index =
         hand[8];
 
 
     const world =
-        handToWorld(index);
+        handToWorld(
+            index
+        );
 
-
-    // ====================================
-    // RETICLE
-    // ====================================
 
     const reticle =
         document.getElementById(
             "reticle"
         );
 
+
     if (reticle) {
 
         reticle.style.display =
             "block";
 
+
         reticle.style.left =
-            ((1 - index.x) * 100) + "%";
+            (
+                (1 - index.x) *
+                100
+            ) + "%";
+
 
         reticle.style.top =
-            (index.y * 100) + "%";
+            (
+                index.y *
+                100
+            ) + "%";
 
     }
 
 
-    // ====================================
-    // PINCH
-    // ====================================
-
     const pinch =
-        pinching(hand);
+        pinching(
+            hand
+        );
 
-
-    // ====================================
-    // START GRAB
-    // ====================================
 
     if (
         pinch &&
@@ -536,7 +755,9 @@ function processHands(results) {
     ) {
 
         const object =
-            closestObject(world);
+            closestObject(
+                world
+            );
 
 
         if (object) {
@@ -544,20 +765,23 @@ function processHands(results) {
             JARVIS_HANDS.grabbing =
                 true;
 
+
             JARVIS_HANDS.grabbed =
                 object;
+
 
             window.JARVIS_GRABBED =
                 object;
 
 
-            // Select object if function exists
             if (
                 typeof selectObject ===
                 "function"
             ) {
 
-                selectObject(object);
+                selectObject(
+                    object
+                );
 
             }
 
@@ -571,6 +795,7 @@ function processHands(results) {
                     "modeText"
                 );
 
+
             if (modeText) {
 
                 modeText.textContent =
@@ -582,10 +807,6 @@ function processHands(results) {
 
     }
 
-
-    // ====================================
-    // MOVE GRABBED OBJECT
-    // ====================================
 
     if (
         pinch &&
@@ -623,10 +844,6 @@ function processHands(results) {
     }
 
 
-    // ====================================
-    // RELEASE
-    // ====================================
-
     if (
         !pinch &&
         JARVIS_HANDS.grabbing
@@ -637,12 +854,9 @@ function processHands(results) {
     }
 
 
-    // ====================================
-    // TWO HANDS
-    // ====================================
-
     if (
-        hands.length === 2
+        hands.length ===
+        2
     ) {
 
         processTwoHands(
@@ -650,30 +864,34 @@ function processHands(results) {
             hands[1]
         );
 
-    } else {
+    }
+    else {
 
-        JARVIS_HANDS
-            .twoHandStartDistance =
+        JARVIS_HANDS.twoHandStartDistance =
             null;
 
     }
+
 }
 
 
-// ========================================
-// RELEASE OBJECT
-// ========================================
+// ======================================
+// RELEASE
+// ======================================
 
 function releaseGrab() {
 
     JARVIS_HANDS.grabbing =
         false;
 
+
     JARVIS_HANDS.grabbed =
         null;
 
+
     window.JARVIS_GRABBED =
         null;
+
 
     JARVIS_HANDS.lastPosition =
         null;
@@ -684,18 +902,20 @@ function releaseGrab() {
             "modeText"
         );
 
+
     if (modeText) {
 
         modeText.textContent =
             "IDLE";
 
     }
+
 }
 
 
-// ========================================
-// TWO-HAND CONTROL
-// ========================================
+// ======================================
+// TWO HAND CONTROL
+// ======================================
 
 function processTwoHands(
     hand1,
@@ -705,7 +925,9 @@ function processTwoHands(
     if (
         !window.JARVIS_SCENE
     ) {
+
         return;
+
     }
 
 
@@ -714,7 +936,9 @@ function processTwoHands(
 
 
     if (!object) {
+
         return;
+
     }
 
 
@@ -739,40 +963,31 @@ function processTwoHands(
         );
 
 
-    // First frame of two-hand control
     if (
-        JARVIS_HANDS
-            .twoHandStartDistance ===
+        JARVIS_HANDS.twoHandStartDistance ===
         null
     ) {
 
-        JARVIS_HANDS
-            .twoHandStartDistance =
+        JARVIS_HANDS.twoHandStartDistance =
             distance;
 
 
-        JARVIS_HANDS
-            .twoHandStartScale =
+        JARVIS_HANDS.twoHandStartScale =
             object.scale.x;
 
 
-        JARVIS_HANDS
-            .twoHandStartAngle =
+        JARVIS_HANDS.twoHandStartAngle =
             angle;
 
 
         return;
+
     }
 
 
-    // ====================================
-    // RESIZE
-    // ====================================
-
     const ratio =
         distance /
-        JARVIS_HANDS
-            .twoHandStartDistance;
+        JARVIS_HANDS.twoHandStartDistance;
 
 
     const scale =
@@ -780,8 +995,7 @@ function processTwoHands(
             0.15,
             Math.min(
                 5,
-                JARVIS_HANDS
-                    .twoHandStartScale *
+                JARVIS_HANDS.twoHandStartScale *
                 ratio
             )
         );
@@ -792,14 +1006,9 @@ function processTwoHands(
     );
 
 
-    // ====================================
-    // ROTATE
-    // ====================================
-
     const rotation =
         angle -
-        JARVIS_HANDS
-            .twoHandStartAngle;
+        JARVIS_HANDS.twoHandStartAngle;
 
 
     object.rotation.z =
@@ -811,18 +1020,20 @@ function processTwoHands(
             "modeText"
         );
 
+
     if (modeText) {
 
         modeText.textContent =
             "TWO HAND";
 
     }
+
 }
 
 
-// ========================================
+// ======================================
 // AUTOMATIC START
-// ========================================
+// ======================================
 
 window.addEventListener(
     "load",
@@ -834,7 +1045,7 @@ window.addEventListener(
                 startHandTracking();
 
             },
-            500
+            1000
         );
 
     }
