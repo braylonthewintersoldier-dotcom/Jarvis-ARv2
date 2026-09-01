@@ -1,166 +1,231 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
+
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
     <title>JARVIS AR</title>
 
     <link rel="stylesheet" href="style.css">
 
-    <!-- THREE.JS -->
     <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
 
-    <!-- MEDIAPIPE -->
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js"></script>
+
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js"></script>
+
 </head>
+
 
 <body>
 
 <div id="app">
 
     <!-- CAMERA -->
-    <video id="camera" autoplay playsinline></video>
+    <video
+        id="camera"
+        autoplay
+        playsinline
+        muted
+    ></video>
 
-    <!-- THREE.JS -->
+
+    <!-- HAND TRACKING OVERLAY -->
+    <canvas id="handCanvas"></canvas>
+
+
+    <!-- 3D WORLD -->
     <canvas id="scene"></canvas>
 
-    <!-- HUD -->
+
+    <!-- MINIMAL HUD -->
     <div id="hud">
 
-        <div class="top-bar">
+
+        <!-- TOP -->
+        <div class="topbar">
+
             <div class="logo">
                 JARVIS
-                <span>AR</span>
             </div>
 
-            <div id="system-status">
-                SYSTEM ONLINE
-            </div>
-        </div>
-
-        <div class="crosshair">
-            <div class="crosshair-horizontal"></div>
-            <div class="crosshair-vertical"></div>
-        </div>
-
-        <div class="reticle" id="reticle"></div>
-
-        <!-- LEFT CONTROLS -->
-        <div class="controls left">
-
-            <button id="cameraButton">
-                CAMERA
-            </button>
-
-            <button id="spawnCube">
-                CUBE
-            </button>
-
-            <button id="spawnSphere">
-                SPHERE
-            </button>
-
-            <button id="spawnPyramid">
-                PYRAMID
-            </button>
-
-            <button id="spawnCylinder">
-                CYLINDER
-            </button>
-
-            <button id="spawnTorus">
-                TORUS
-            </button>
-
-        </div>
-
-        <!-- RIGHT CONTROLS -->
-        <div class="controls right">
-
-            <button id="deleteButton">
-                DELETE
-            </button>
-
-            <button id="duplicateButton">
-                DUPLICATE
-            </button>
-
-            <button id="resetButton">
-                RESET
-            </button>
-
-            <button id="physicsButton">
-                PHYSICS
-            </button>
-
-        </div>
-
-        <!-- JARVIS CHAT -->
-        <div id="jarvis-panel">
-
-            <div id="jarvis-title">
-                JARVIS
+            <div id="systemStatus">
+                ● ONLINE
             </div>
 
-            <div id="chat-output">
-                <div class="jarvis-message">
-                    JARVIS ONLINE
+        </div>
+
+
+        <!-- SMALL LEFT TOOLBAR -->
+        <div class="toolbar left">
+
+
+            <button id="cameraBtn">
+                CAM
+            </button>
+
+
+            <button id="buildBtn">
+                BUILD
+            </button>
+
+
+            <button id="cubeBtn">
+                +
+            </button>
+
+
+        </div>
+
+
+        <!-- SMALL RIGHT TOOLBAR -->
+        <div class="toolbar right">
+
+
+            <button id="deleteBtn">
+                DEL
+            </button>
+
+
+            <button id="duplicateBtn">
+                DUP
+            </button>
+
+
+            <button id="physicsBtn">
+                PHY
+            </button>
+
+
+            <button id="resetBtn">
+                CLR
+            </button>
+
+
+        </div>
+
+
+        <!-- SMALL OBJECT MENU -->
+        <div id="objectMenu">
+
+
+            <button id="sphereBtn">
+                SPH
+            </button>
+
+
+            <button id="cylinderBtn">
+                CYL
+            </button>
+
+
+            <button id="pyramidBtn">
+                PYR
+            </button>
+
+
+            <button id="torusBtn">
+                TOR
+            </button>
+
+
+        </div>
+
+
+        <!-- RETICLE -->
+        <div id="reticle"></div>
+
+
+        <!-- JARVIS -->
+        <div id="jarvisPanel">
+
+
+            <div id="jarvisHeader">
+
+                <span>
+                    JARVIS
+                </span>
+
+                <span id="jarvisState">
+                    READY
+                </span>
+
+            </div>
+
+
+            <div id="chatOutput">
+
+                <div class="jarvisLine">
+                    Systems online.
                 </div>
 
-                <div class="jarvis-message">
-                    Ready.
-                </div>
             </div>
 
-            <div id="chat-input-area">
+
+            <div id="chatControls">
 
                 <input
-                    id="chat-input"
+                    id="chatInput"
                     type="text"
                     placeholder="Ask JARVIS..."
+                    autocomplete="off"
                 >
 
-                <button id="send-button">
-                    SEND
+
+                <button id="micBtn">
+                    🎤
+                </button>
+
+
+                <button id="sendBtn">
+                    →
                 </button>
 
             </div>
 
-        </div>
-
-        <!-- BOTTOM STATUS -->
-        <div id="status-bar">
-
-            <div>
-                SYSTEM:
-                <span id="systemText">ONLINE</span>
-            </div>
-
-            <div>
-                HANDS:
-                <span id="handText">0</span>
-            </div>
-
-            <div>
-                OBJECTS:
-                <span id="objectText">0</span>
-            </div>
-
-            <div>
-                MODE:
-                <span id="modeText">IDLE</span>
-            </div>
 
         </div>
+
+
+        <!-- STATUS -->
+        <div id="status">
+
+            <span>
+                HANDS
+                <b id="handText">0</b>
+            </span>
+
+            <span>
+                OBJECTS
+                <b id="objectText">0</b>
+            </span>
+
+            <span>
+                <b id="modeText">IDLE</b>
+            </span>
+
+        </div>
+
 
     </div>
 
 </div>
 
+
+<script src="scene.js"></script>
+<script src="handTracking.js"></script>
+<script src="builder.js"></script>
+<script src="voice.js"></script>
+<script src="storage.js"></script>
 <script src="app.js"></script>
 
+
 </body>
+
 </html>
