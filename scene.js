@@ -16,10 +16,11 @@ const WORLD_WIDTH = 8;
 const WORLD_HEIGHT = 4.5;
 
 /* =========================
-   START THREE.JS
+   THREE.JS SETUP
    ========================= */
 
 function initScene() {
+
     scene = new THREE.Scene();
 
     threeCamera = new THREE.PerspectiveCamera(
@@ -55,30 +56,35 @@ function initScene() {
     renderer.domElement.style.pointerEvents = "none";
     renderer.domElement.style.zIndex = "1";
 
-    const oldCanvas = document.getElementById("scene");
+    const oldCanvas =
+        document.getElementById("scene");
 
     if (oldCanvas) {
-        oldCanvas.replaceWith(renderer.domElement);
+        oldCanvas.replaceWith(
+            renderer.domElement
+        );
     } else {
-        document.body.appendChild(renderer.domElement);
+        document.body.appendChild(
+            renderer.domElement
+        );
     }
 
-    /* =========================
-       LIGHTING
-       ========================= */
+    /* LIGHT */
 
-    const ambientLight = new THREE.AmbientLight(
-        0xffffff,
-        1.2
-    );
+    const ambientLight =
+        new THREE.AmbientLight(
+            0xffffff,
+            1.2
+        );
 
     scene.add(ambientLight);
 
-    const pointLight = new THREE.PointLight(
-        0x00ffff,
-        3,
-        30
-    );
+    const pointLight =
+        new THREE.PointLight(
+            0x00ffff,
+            3,
+            30
+        );
 
     pointLight.position.set(
         0,
@@ -95,82 +101,104 @@ function initScene() {
 
     animate();
 
-    console.log("JARVIS: Scene ready");
+    console.log(
+        "JARVIS: Scene ready"
+    );
 }
 
 /* =========================
-   HOLOGRAM MATERIAL
+   MATERIAL
    ========================= */
 
 function hologramMaterial() {
+
     return new THREE.MeshStandardMaterial({
         color: 0x00ffff,
         emissive: 0x00ffff,
         emissiveIntensity: 1.5,
         transparent: true,
-        opacity: 0.72,
-        wireframe: false
+        opacity: 0.72
     });
 }
 
 /* =========================
-   CREATE OBJECT
+   ADD OBJECT
    ========================= */
 
-function addObject(type = "cube") {
+function addObject(
+    type = "cube"
+) {
 
     let geometry;
 
-    switch (type.toLowerCase()) {
+    switch (
+        type.toLowerCase()
+    ) {
 
         case "sphere":
-            geometry = new THREE.SphereGeometry(
-                0.65,
-                32,
-                32
-            );
+
+            geometry =
+                new THREE.SphereGeometry(
+                    0.65,
+                    32,
+                    32
+                );
+
             break;
 
         case "cylinder":
-            geometry = new THREE.CylinderGeometry(
-                0.55,
-                0.55,
-                1.2,
-                32
-            );
+
+            geometry =
+                new THREE.CylinderGeometry(
+                    0.55,
+                    0.55,
+                    1.2,
+                    32
+                );
+
             break;
 
         case "pyramid":
-            geometry = new THREE.ConeGeometry(
-                0.7,
-                1.3,
-                4
-            );
+
+            geometry =
+                new THREE.ConeGeometry(
+                    0.7,
+                    1.3,
+                    4
+                );
+
             break;
 
         case "torus":
-            geometry = new THREE.TorusGeometry(
-                0.6,
-                0.18,
-                16,
-                32
-            );
+
+            geometry =
+                new THREE.TorusGeometry(
+                    0.6,
+                    0.18,
+                    16,
+                    32
+                );
+
             break;
 
         case "cube":
         default:
-            geometry = new THREE.BoxGeometry(
-                1.1,
-                1.1,
-                1.1
-            );
+
+            geometry =
+                new THREE.BoxGeometry(
+                    1.1,
+                    1.1,
+                    1.1
+                );
+
             break;
     }
 
-    const mesh = new THREE.Mesh(
-        geometry,
-        hologramMaterial()
-    );
+    const mesh =
+        new THREE.Mesh(
+            geometry,
+            hologramMaterial()
+        );
 
     mesh.position.set(
         0,
@@ -178,17 +206,21 @@ function addObject(type = "cube") {
         0
     );
 
-    mesh.userData.type = type;
+    mesh.userData.type =
+        type;
+
     mesh.userData.velocity =
         new THREE.Vector3();
 
-    mesh.userData.grabbed = false;
+    mesh.userData.grabbed =
+        false;
 
     scene.add(mesh);
 
     objects.push(mesh);
 
-    selectedObject = mesh;
+    selectedObject =
+        mesh;
 
     console.log(
         "JARVIS: Added",
@@ -205,9 +237,6 @@ function addObject(type = "cube") {
 function deleteSelected() {
 
     if (!selectedObject) {
-        console.log(
-            "JARVIS: Nothing selected"
-        );
         return;
     }
 
@@ -215,24 +244,30 @@ function deleteSelected() {
         selectedObject
     );
 
-    if (selectedObject.geometry) {
+    if (
+        selectedObject.geometry
+    ) {
         selectedObject.geometry.dispose();
     }
 
-    if (selectedObject.material) {
+    if (
+        selectedObject.material
+    ) {
         selectedObject.material.dispose();
     }
 
-    objects = objects.filter(
-        object => object !== selectedObject
-    );
+    objects =
+        objects.filter(
+            object =>
+                object !==
+                selectedObject
+        );
 
-    selectedObject = null;
-    grabbedObject = null;
+    selectedObject =
+        null;
 
-    console.log(
-        "JARVIS: Object deleted"
-    );
+    grabbedObject =
+        null;
 }
 
 /* =========================
@@ -242,9 +277,6 @@ function deleteSelected() {
 function duplicateSelected() {
 
     if (!selectedObject) {
-        console.log(
-            "JARVIS: Nothing selected"
-        );
         return;
     }
 
@@ -252,6 +284,7 @@ function duplicateSelected() {
         selectedObject.clone();
 
     clone.position.x += 1;
+
     clone.position.y += 0.5;
 
     clone.userData = {
@@ -268,11 +301,8 @@ function duplicateSelected() {
 
     objects.push(clone);
 
-    selectedObject = clone;
-
-    console.log(
-        "JARVIS: Object duplicated"
-    );
+    selectedObject =
+        clone;
 }
 
 /* =========================
@@ -281,7 +311,9 @@ function duplicateSelected() {
 
 function resetScene() {
 
-    for (const object of objects) {
+    for (
+        const object of objects
+    ) {
 
         scene.remove(object);
 
@@ -296,12 +328,11 @@ function resetScene() {
 
     objects = [];
 
-    selectedObject = null;
-    grabbedObject = null;
+    selectedObject =
+        null;
 
-    console.log(
-        "JARVIS: Scene reset"
-    );
+    grabbedObject =
+        null;
 }
 
 /* =========================
@@ -313,54 +344,52 @@ function togglePhysics() {
     physicsEnabled =
         !physicsEnabled;
 
-    console.log(
-        "JARVIS: Physics",
-        physicsEnabled
-            ? "ON"
-            : "OFF"
-    );
-
     return physicsEnabled;
 }
 
 /* =========================
-   HAND → 3D WORLD
+   HAND → WORLD
    ========================= */
 
-function handPositionToWorld(point) {
+function handPositionToWorld(
+    point
+) {
 
     if (!point) {
         return null;
     }
 
     /*
-       IMPORTANT
+       IMPORTANT:
 
-       The camera is mirrored with:
+       Camera is mirrored.
 
-       scaleX(-1)
-
-       Therefore we reverse MediaPipe's
-       X coordinate for the 3D world.
-
-       Physical hand moves RIGHT
-       → mirrored screen moves RIGHT
-       → 3D object moves RIGHT
+       Reverse MediaPipe X so
+       physical hand movement and
+       3D movement match.
     */
 
     const mirroredX =
         1 - point.x;
 
     const x =
-        (mirroredX - 0.5) *
-        WORLD_WIDTH;
+        (
+            mirroredX -
+            0.5
+        ) * WORLD_WIDTH;
 
     const y =
-        -(point.y - 0.5) *
-        WORLD_HEIGHT;
+        -(
+            point.y -
+            0.5
+        ) * WORLD_HEIGHT;
 
-    const z =
-        -point.z * 3;
+    /*
+       Keep the object on a stable
+       hologram plane.
+    */
+
+    const z = 0;
 
     return new THREE.Vector3(
         x,
@@ -370,44 +399,7 @@ function handPositionToWorld(point) {
 }
 
 /* =========================
-   FIND OBJECT
-   ========================= */
-
-function findObjectNearHand(
-    worldPosition
-) {
-
-    if (!worldPosition) {
-        return null;
-    }
-
-    let closest = null;
-
-    let closestDistance =
-        Infinity;
-
-    for (const object of objects) {
-
-        const distance =
-            object.position.distanceTo(
-                worldPosition
-            );
-
-        if (
-            distance < 1.1 &&
-            distance < closestDistance
-        ) {
-            closest = object;
-            closestDistance =
-                distance;
-        }
-    }
-
-    return closest;
-}
-
-/* =========================
-   PINCH DETECTION
+   PINCH
    ========================= */
 
 function isPinching(
@@ -428,13 +420,16 @@ function isPinching(
         landmarks[8];
 
     const dx =
-        thumb.x - index.x;
+        thumb.x -
+        index.x;
 
     const dy =
-        thumb.y - index.y;
+        thumb.y -
+        index.y;
 
     const dz =
-        thumb.z - index.z;
+        thumb.z -
+        index.z;
 
     const distance =
         Math.sqrt(
@@ -444,6 +439,48 @@ function isPinching(
         );
 
     return distance < 0.055;
+}
+
+/* =========================
+   FIND OBJECT
+   ========================= */
+
+function findObjectNearHand(
+    worldPosition
+) {
+
+    if (!worldPosition) {
+        return null;
+    }
+
+    let closest = null;
+
+    let closestDistance =
+        Infinity;
+
+    for (
+        const object of objects
+    ) {
+
+        const distance =
+            object.position.distanceTo(
+                worldPosition
+            );
+
+        if (
+            distance < 1.3 &&
+            distance < closestDistance
+        ) {
+
+            closest =
+                object;
+
+            closestDistance =
+                distance;
+        }
+    }
+
+    return closest;
 }
 
 /* =========================
@@ -485,6 +522,10 @@ function updateHandInteraction() {
             indexTip
         );
 
+    if (!worldPosition) {
+        return;
+    }
+
     const pinching =
         isPinching(
             landmarks
@@ -515,18 +556,23 @@ function updateHandInteraction() {
             target.userData.grabbed =
                 true;
 
-            grabOffset
-                .copy(target.position)
-                .sub(worldPosition);
+            /*
+               Keep the exact point where
+               the finger grabbed the object.
+            */
 
-            console.log(
-                "JARVIS: Object grabbed"
-            );
+            grabOffset
+                .copy(
+                    target.position
+                )
+                .sub(
+                    worldPosition
+                );
         }
     }
 
     /* =====================
-       MOVE
+       DIRECT FOLLOW
        ===================== */
 
     if (
@@ -534,13 +580,32 @@ function updateHandInteraction() {
         grabbedObject
     ) {
 
-        grabbedObject.position
-            .copy(worldPosition)
-            .add(grabOffset);
+        /*
+           NO smoothing.
+
+           The object immediately
+           follows the fingertip.
+        */
+
+        grabbedObject.position.x =
+            worldPosition.x +
+            grabOffset.x;
+
+        grabbedObject.position.y =
+            worldPosition.y +
+            grabOffset.y;
+
+        grabbedObject.position.z =
+            worldPosition.z +
+            grabOffset.z;
 
         grabbedObject.userData
             .velocity
-            .set(0, 0, 0);
+            .set(
+                0,
+                0,
+                0
+            );
     }
 
     /* =====================
@@ -569,11 +634,8 @@ function releaseObject() {
     grabbedObject.userData.grabbed =
         false;
 
-    console.log(
-        "JARVIS: Object released"
-    );
-
-    grabbedObject = null;
+    grabbedObject =
+        null;
 }
 
 /* =========================
@@ -588,7 +650,9 @@ function updatePhysics(
         return;
     }
 
-    for (const object of objects) {
+    for (
+        const object of objects
+    ) {
 
         if (
             object.userData.grabbed
@@ -600,7 +664,8 @@ function updatePhysics(
             object.userData.velocity;
 
         velocity.y -=
-            3.5 * deltaTime;
+            3.5 *
+            deltaTime;
 
         object.position.x +=
             velocity.x *
@@ -614,19 +679,22 @@ function updatePhysics(
             velocity.z *
             deltaTime;
 
-        /* Floor */
-
         if (
-            object.position.y < -2
+            object.position.y <
+            -2
         ) {
 
-            object.position.y = -2;
+            object.position.y =
+                -2;
 
-            velocity.y *= -0.55;
+            velocity.y *=
+                -0.55;
 
-            velocity.x *= 0.92;
+            velocity.x *=
+                0.92;
 
-            velocity.z *= 0.92;
+            velocity.z *=
+                0.92;
         }
     }
 }
@@ -644,28 +712,26 @@ function animate() {
         animate
     );
 
-    const currentTime =
+    const now =
         performance.now();
 
     const deltaTime =
         Math.min(
             (
-                currentTime -
+                now -
                 lastTime
             ) / 1000,
             0.05
         );
 
     lastTime =
-        currentTime;
+        now;
 
     updateHandInteraction();
 
     updatePhysics(
         deltaTime
     );
-
-    /* Hologram movement */
 
     for (
         const object of objects
@@ -716,7 +782,7 @@ function resizeScene() {
 }
 
 /* =========================
-   GET SCENE OBJECTS
+   SCENE DATA
    ========================= */
 
 function getSceneObjects() {
@@ -789,7 +855,7 @@ window.getSelectedObject =
     () => selectedObject;
 
 /* =========================
-   START SCENE
+   START
    ========================= */
 
 window.addEventListener(
